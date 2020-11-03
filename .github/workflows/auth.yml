@@ -1,0 +1,29 @@
+name: OpenShift Auth
+
+# Run this workflow every time a new commit pushed to your repository
+on: [ push, workflow_dispatch ]
+
+jobs:
+  # Set the job key. The key is displayed as the job name
+  # when a job name is not provided
+  auth:
+    name: OpenShift Auth
+    # Set the type of machine to run on
+    runs-on: ubuntu-18.04
+    #outputs:
+      #kubeconfig: ${{steps.auth.outputs.kubeconfig}}
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+        env:
+          DEFAULT_BRANCH: main
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: auth
+        id: auth
+        uses: tetchel/first-action@master
+        with:
+          openshift_url: ${{ secrets.OPENSHIFT_URL }}
+          openshift_token: ${{ secrets.OPENSHIFT_TOKEN }}
+          insecure_skip_tls_verify: true
