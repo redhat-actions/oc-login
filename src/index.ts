@@ -1,6 +1,6 @@
 
 import * as ghCore from "@actions/core";
-import { OcOptions, ocExec, OcCommands, getOptions, OcFlags } from './ocExec';
+import { OcOptions, ocExec, OcCommands, getOptions, OcFlags, getKubeConfig } from './ocExec';
 
 interface Auth {
     credentials?: {
@@ -35,7 +35,8 @@ async function auth(serverURL: string, auth: Auth): Promise<void> {
         authOptions[OcFlags.SkipTLSVerify] = "";
     }
 
-    const exitCode = await ocExec(OcCommands.Login, ...getOptions({ [OcFlags.Server]: serverURL }), ...getOptions(authOptions));
+    const ocExecArgs = [ OcCommands.Login, ...getOptions({ [OcFlags.Server]: serverURL }), ...getOptions(authOptions) ];
+    const exitCode = (await ocExec(ocExecArgs)).exitCode;
     if (exitCode != 0) {
         throw new Error(`Authentication failed with exit code ${exitCode}`);
     }
@@ -54,7 +55,7 @@ function getAuthInputs(): Auth {
 
     const openshiftToken = ghCore.getInput(Inputs.OS_TOKEN);
     if (openshiftToken) {
-        ghCore.info("Found Openshift Token");
+        ghCore.debug("Found Openshift Token");
         return {
             token: openshiftToken,
             skipTlsVerify,
@@ -63,7 +64,7 @@ function getAuthInputs(): Auth {
     const openshiftUsername = ghCore.getInput(Inputs.OS_USERNAME);
     const openshiftPassword = ghCore.getInput(Inputs.OS_PASSWORD);
     if (openshiftUsername && openshiftPassword) {
-        ghCore.info("Found Openshift credentials");
+        ghCore.debug("Found Openshift credentials");
         return {
             credentials: {
                 username: openshiftUsername,
@@ -79,16 +80,21 @@ async function main() {
     const openshiftUrl = ghCore.getInput(Inputs.OS_SERVER_URL);
 
     if (openshiftUrl) {
-        ghCore.info("Found Openshift URL");
+        ghCore.debug("Found Openshift URL");
     }
     else {
         throw new Error(`OpenShift URL not provided. "${Inputs.OS_SERVER_URL}" is a required input.`);
     }
 
     await auth(openshiftUrl, getAuthInputs());
+
+    const kubeconfig = await getKubeConfig();
+    ghCore.info("KUBECONFIG");
+    ghCore.info(kubeconfig);
 }
 
 ghCore.setCommandEcho(true);
+
 main().then(() => {
     // success
     ghCore.info("Success.");
