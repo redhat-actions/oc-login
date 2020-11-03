@@ -17,6 +17,9 @@ inputs:
   openshift_password:
     description: 'Openshift Password. Must be used with openshift_username.'
     required: false
+outputs:
+  kubeconfig:
+    description: 'Kubeconfig file after performing the login.'
 runs:
   using: 'node12'
   main: 'dist/index.js'

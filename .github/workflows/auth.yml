@@ -6,12 +6,12 @@ on: [ push, workflow_dispatch ]
 jobs:
   # Set the job key. The key is displayed as the job name
   # when a job name is not provided
-  auth:
+  authjob:
     name: OpenShift Auth
     # Set the type of machine to run on
     runs-on: ubuntu-18.04
-    #outputs:
-      #kubeconfig: ${{steps.auth.outputs.kubeconfig}}
+    # outputs:
+      # kubeconfig: ${{ steps.auth.outputs.kubeconfig }}
 
     steps:
       - name: checkout
@@ -27,3 +27,7 @@ jobs:
           openshift_url: ${{ secrets.OPENSHIFT_URL }}
           openshift_token: ${{ secrets.OPENSHIFT_TOKEN }}
           insecure_skip_tls_verify: true
+
+      - name: get-projects
+        run: |
+          oc get projects

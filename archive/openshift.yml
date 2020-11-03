@@ -24,6 +24,7 @@ jobs:
         #uses: redhat-developer/openshift-actions@v2.1.0
 
       - name: auth
+        id: auth
         shell: bash
         run: |
           oc login --token=${{ secrets.API_TOKEN }} --server=${{ secrets.OPENSHIFT_SERVER_URL }} --insecure-skip-tls-verify=true
