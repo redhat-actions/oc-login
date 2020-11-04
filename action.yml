@@ -20,9 +20,13 @@ inputs:
   skip_kubeconfig:
     description: 'Do not generate kubeconfig or export its path.'
     required: false
-outputs:
-  kubeconfig:
-    description: 'Path to kubeconfig file after performing the login.'
+  namespace:
+    description: >
+      Set current context's namespace to this, after logging in.
+    required: false
+#outputs:
+#  kubeconfig:
+#    description: 'Path to kubeconfig file after performing the login.'
 runs:
   using: 'node12'
   main: 'dist/index.js'

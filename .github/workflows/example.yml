@@ -23,10 +23,7 @@ jobs:
           openshift_url: ${{ secrets.OPENSHIFT_URL }}
           openshift_token: ${{ secrets.OPENSHIFT_TOKEN }}
           insecure_skip_tls_verify: true
-
-      - name: Set Namespace
-        run: |
-          oc config set-context $(oc config current-context) --namespace=${{ env.TEST_NAMESPACE }}
+          namespace: ${{ env.TEST_NAMESPACE }}
 
       - name: Deploy
         uses: Azure/k8s-deploy@v1.3

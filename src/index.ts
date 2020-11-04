@@ -1,33 +1,31 @@
+/*************************************************************************************************
+ *  Copyright (c) Red Hat, Inc. All rights reserved.
+ *  Licensed under the MIT License. See LICENSE file in the project root for license information.
+ *************************************************************************************************/
 
 import * as ghCore from "@actions/core";
 import Auth from "./auth";
-import { Inputs, Outputs } from './inputs-outputs';
+import { Inputs } from './inputs-outputs';
 import KubeConfig from "./kubeconfig";
 
 async function run() {
-    const openshiftUrl = ghCore.getInput(Inputs.OS_SERVER_URL, { required: true });
+    await Auth.login(Auth.getAuthInputs());
 
-    if (openshiftUrl) {
-        ghCore.debug("Found Openshift URL");
+    const namespace = ghCore.getInput(Inputs.NAMESPACE);
+    if (namespace) {
+        await KubeConfig.setCurrentContextNamespace(namespace);
     }
-    else {
-        throw new Error(`OpenShift URL not provided. "${Inputs.OS_SERVER_URL}" is a required input.`);
-    }
-
-    await Auth.login(openshiftUrl, Auth.getAuthInputs());
 
     if (ghCore.getInput(Inputs.SKIP_KUBECONFIG) == "true") {
         ghCore.info(`"${Inputs.SKIP_KUBECONFIG}" is set; skipping generating kubeconfig`);
     }
     else {
-        const kubeConfigPath = await KubeConfig.exportKubeConfig();
-        ghCore.setOutput(Outputs.KUBECONFIG, kubeConfigPath);
+        await KubeConfig.exportKubeConfig();
     }
 }
 
 run()
 .then(() => {
-    // success
     ghCore.info("Success.");
 })
 .catch(ghCore.setFailed);

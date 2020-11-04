@@ -5,7 +5,7 @@
     "node": "12"
   },
   "description": "",
-  "main": "dist/action.js",
+  "main": "dist/index.js",
   "scripts": {
     "compile": "tsc -p .",
     "bundle": "ncc build src/index.ts --source-map --minify",
@@ -20,7 +20,7 @@
     "@actions/github": "^4.0.0"
   },
   "devDependencies": {
-    "@types/node": "^12.19.3",
+    "@types/node": "12",
     "@vercel/ncc": "^0.24.1",
     "typescript": "^4.0.5"
   }

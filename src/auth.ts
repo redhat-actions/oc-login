@@ -1,9 +1,15 @@
+/*************************************************************************************************
+ *  Copyright (c) Red Hat, Inc. All rights reserved.
+ *  Licensed under the MIT License. See LICENSE file in the project root for license information.
+ *************************************************************************************************/
+
 import * as ghCore from "@actions/core";
 import { Inputs } from './inputs-outputs';
 import Oc from './oc';
 
 namespace Auth {
-    interface AuthInfo {
+    interface OSAuthInfo {
+        serverURL: string;
         credentials?: {
             username: string;
             password: string;
@@ -12,37 +18,58 @@ namespace Auth {
         skipTlsVerify: boolean;
     }
 
-    export function getAuthInputs(): AuthInfo {
+    /**
+     * Get the token or credentials action inputs and return them in one object.
+     */
+    export function getAuthInputs(): OSAuthInfo {
+        const serverURL = ghCore.getInput(Inputs.OS_SERVER_URL, { required: true });
+
+        if (serverURL) {
+            ghCore.debug("Found OpenShift Server URL");
+        }
+
         const skipTlsVerify = ghCore.getInput(Inputs.SKIP_TLS_VERIFY) == "true";
+
+        const authInfo: OSAuthInfo = {
+            serverURL,
+            skipTlsVerify,
+        };
 
         const openshiftToken = ghCore.getInput(Inputs.OS_TOKEN);
         if (openshiftToken) {
-            ghCore.debug("Found Openshift Token");
+            ghCore.debug("Found OpenShift Token");
             return {
+                ...authInfo,
                 token: openshiftToken,
-                skipTlsVerify,
             };
         }
+
+        // no token - proceed to username/password
         const openshiftUsername = ghCore.getInput(Inputs.OS_USERNAME);
         const openshiftPassword = ghCore.getInput(Inputs.OS_PASSWORD);
+
         if (openshiftUsername && openshiftPassword) {
-            ghCore.debug("Found Openshift credentials");
+            ghCore.debug("Found OpenShift credentials");
             return {
+                ...authInfo,
                 credentials: {
                     username: openshiftUsername,
                     password: openshiftPassword
                 },
-                skipTlsVerify
             };
         }
-        throw new Error(`OpenShift URL not provided. "${Inputs.OS_SERVER_URL}" is a required input.`);
+
+        // neither token nor username/password are set
+        throw new Error(`Failed to login: Required action inputs are missing. ` +
+            `Either "${Inputs.OS_TOKEN}", or both "${Inputs.OS_USERNAME}" and "${Inputs.OS_PASSWORD}" must be set.`
+        );
     }
 
     /**
      * Performs an 'oc login' into the given server, with the given access token or credentials.
      * Token is given precedence if both are present.
      */
-    export async function login(serverURL: string, auth: AuthInfo): Promise<void> {
+    export async function login(auth: OSAuthInfo): Promise<void> {
         let authOptions: Oc.Options;
         if (auth.token) {
             ghCore.info("Authenticating using token");
@@ -62,11 +89,13 @@ namespace Auth {
             throw new Error("Neither a token nor credentials was provided.");
         }
 
+        authOptions[Oc.Flags.ServerURL] = auth.serverURL;
+
         if (auth.skipTlsVerify) {
             authOptions[Oc.Flags.SkipTLSVerify] = "";
         }
 
-        const ocExecArgs = [ Oc.Commands.Login, ...Oc.getOptions({ [Oc.Flags.Server]: serverURL }), ...Oc.getOptions(authOptions) ];
+        const ocExecArgs = [ Oc.Commands.Login, ...Oc.getOptions(authOptions) ];
         const exitCode = (await Oc.exec(ocExecArgs)).exitCode;
         if (exitCode != 0) {
             throw new Error(`Authentication failed with exit code ${exitCode}`);
