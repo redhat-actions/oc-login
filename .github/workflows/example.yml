@@ -1,4 +1,4 @@
-name: OpenShift Actions Test
+name: OpenShift Authentication Example
 on: [ push, workflow_dispatch ]
 
 jobs:

@@ -16,7 +16,10 @@ async function run() {
 
     await Auth.login(openshiftUrl, Auth.getAuthInputs());
 
-    if (ghCore.getInput(Inputs.SKIP_KUBECONFIG) != "true") {
+    if (ghCore.getInput(Inputs.SKIP_KUBECONFIG) == "true") {
+        ghCore.info(`"${Inputs.SKIP_KUBECONFIG}" is set; skipping generating kubeconfig`);
+    }
+    else {
         const kubeConfigPath = await KubeConfig.exportKubeConfig();
         ghCore.setOutput(Outputs.KUBECONFIG, kubeConfigPath);
     }
