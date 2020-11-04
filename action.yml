@@ -1,7 +1,8 @@
 name: 'OpenShift Authenticator'
 description: 'Authenticates against openshift :)'
 inputs:
-  openshift_url:
+  ##### Inputs for login
+  openshift_server_url:
     description: 'Openshift Server URL.'
     required: true
   insecure_skip_tls_verify:
@@ -17,6 +18,8 @@ inputs:
   openshift_password:
     description: 'Openshift Password. Must be used with openshift_username.'
     required: false
+
+  ##### Inputs for kubeconfig
   skip_kubeconfig:
     description: 'Do not generate kubeconfig or export its path.'
     required: false
@@ -24,9 +27,9 @@ inputs:
     description: >
       Set current context's namespace to this, after logging in.
     required: false
-#outputs:
-#  kubeconfig:
-#    description: 'Path to kubeconfig file after performing the login.'
+
+# outputs:
+
 runs:
   using: 'node12'
   main: 'dist/index.js'

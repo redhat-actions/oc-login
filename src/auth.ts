@@ -2,9 +2,8 @@
  *  Copyright (c) Red Hat, Inc. All rights reserved.
  *  Licensed under the MIT License. See LICENSE file in the project root for license information.
  *************************************************************************************************/
-
 import * as ghCore from "@actions/core";
-import { Inputs } from './inputs-outputs';
+import { Inputs } from './generated/inputs-outputs';
 import Oc from './oc';
 
 namespace Auth {
@@ -22,20 +21,20 @@ namespace Auth {
      * Get the token or credentials action inputs and return them in one object.
      */
     export function getAuthInputs(): OSAuthInfo {
-        const serverURL = ghCore.getInput(Inputs.OS_SERVER_URL, { required: true });
+        const serverURL = ghCore.getInput(Inputs.OPENSHIFT_SERVER_URL, { required: true });
 
         if (serverURL) {
             ghCore.debug("Found OpenShift Server URL");
         }
 
-        const skipTlsVerify = ghCore.getInput(Inputs.SKIP_TLS_VERIFY) == "true";
+        const skipTlsVerify = ghCore.getInput(Inputs.INSECURE_SKIP_TLS_VERIFY) == "true";
 
         const authInfo: OSAuthInfo = {
             serverURL,
             skipTlsVerify,
         };
 
-        const openshiftToken = ghCore.getInput(Inputs.OS_TOKEN);
+        const openshiftToken = ghCore.getInput(Inputs.OPENSHIFT_TOKEN);
         if (openshiftToken) {
             ghCore.debug("Found OpenShift Token");
             return {
@@ -45,8 +44,8 @@ namespace Auth {
         }
 
         // no token - proceed to username/password
-        const openshiftUsername = ghCore.getInput(Inputs.OS_USERNAME);
-        const openshiftPassword = ghCore.getInput(Inputs.OS_PASSWORD);
+        const openshiftUsername = ghCore.getInput(Inputs.OPENSHIFT_USERNAME);
+        const openshiftPassword = ghCore.getInput(Inputs.OPENSHIFT_PASSWORD);
 
         if (openshiftUsername && openshiftPassword) {
             ghCore.debug("Found OpenShift credentials");
@@ -61,7 +60,7 @@ namespace Auth {
 
         // neither token nor username/password are set
         throw new Error(`Failed to login: Required action inputs are missing. ` +
-            `Either "${Inputs.OS_TOKEN}", or both "${Inputs.OS_USERNAME}" and "${Inputs.OS_PASSWORD}" must be set.`
+            `Either "${Inputs.OPENSHIFT_TOKEN}", or both "${Inputs.OPENSHIFT_USERNAME}" and "${Inputs.OPENSHIFT_PASSWORD}" must be set.`
         );
     }
 

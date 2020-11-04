@@ -5,7 +5,7 @@
 
 import * as ghCore from "@actions/core";
 import Auth from "./auth";
-import { Inputs } from './inputs-outputs';
+import { Inputs } from './generated/inputs-outputs';
 import KubeConfig from "./kubeconfig";
 
 async function run() {

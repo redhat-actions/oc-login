@@ -1,0 +1,69 @@
+name: Verify Generated Code Matches
+on: [ push, pull_request ]
+jobs:
+  check-inputs-outputs:
+    name: Check Input and Output enums
+    runs-on: ubuntu-latest
+    env:
+      COMMITTED_FILENAME: src/generated/inputs-outputs.ts
+      GENERATED_FILENAME: action-generated-ins-outs.ts
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        env:
+          DEFAULT_BRANCH: main
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate
+        run: |
+          npm run generate-ins-outs -- '${{ env.GENERATED_FILENAME }}'
+
+      - name: Test equivalence
+        run: git --no-pager diff --no-index --exit-code '${{ env.COMMITTED_FILENAME }}' '${{ env.GENERATED_FILENAME }}'
+
+      - name: Print contents
+        if: ${{ failure() }}
+        run: |
+          echo "----- Contents of ${{ env.GENERATED_FILENAME }} -----"
+          cat '${{ env.GENERATED_FILENAME }}'
+          echo "----- End Contents ----"
+
+          echo "---- Contents of ${{ env.COMMITTED_FILENAME }} -----"
+          cat '${{ env.COMMITTED_FILENAME }}'
+          echo "---- End Contents -----"
+
+
+  check-dist:
+    name: Check Distribution
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        env:
+          DEFAULT_BRANCH: main
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Hash committed distribution
+        run: |
+          echo "DIST_HASH=${{ hashFiles('dist/*') }}" >> $GITHUB_ENV
+
+      - name: Regenerate distribution
+        run: npm run bundle -- --out='action-dist'
+
+      - name: Hash regenerated distribution
+        run: |
+          echo "ACTION_DIST_HASH=${{ hashFiles('action-dist/*') }}" >> $GITHUB_ENV
+
+      - name: Check hashes match
+        run: |
+          echo "Committed dist hash is: \"$DIST_HASH\""
+          echo "Generated dist hash is: \"$ACTION_DIST_HASH\""
+          [[ $DIST_HASH == $ACTION_DIST_HASH ]]
+          echo "Success!"
