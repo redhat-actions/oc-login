@@ -1,26 +1,22 @@
-name: OpenShift Auth
-
-# Run this workflow every time a new commit pushed to your repository
+name: OpenShift Actions Test
 on: [ push, workflow_dispatch ]
 
 jobs:
-  # Set the job key. The key is displayed as the job name
-  # when a job name is not provided
-  authjob:
-    name: OpenShift Auth
-    # Set the type of machine to run on
+  auth:
+    name: OpenShift Login and Test
     runs-on: ubuntu-18.04
-    # outputs:
-      # kubeconfig: ${{ steps.auth.outputs.kubeconfig }}
+    env:
+      TEST_MANIFEST: __tests__/manifests/timer.yaml
+      TEST_NAMESPACE: tetchell-dev
 
     steps:
-      - name: checkout
+      - name: Checkout
         uses: actions/checkout@v2
         env:
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: auth
+      - name: Authenticate and set context
         id: auth
         uses: tetchel/first-action@master
         with:
@@ -28,6 +24,16 @@ jobs:
           openshift_token: ${{ secrets.OPENSHIFT_TOKEN }}
           insecure_skip_tls_verify: true
 
-      - name: get-projects
+      - name: Set Namespace
         run: |
-          oc get projects
+          oc config set-context $(oc config current-context) --namespace=${{ env.TEST_NAMESPACE }}
+
+      - name: Deploy
+        uses: Azure/k8s-deploy@v1.3
+        with:
+          namespace: ${{ env.TEST_NAMESPACE }}
+          manifests: ${{ env.TEST_MANIFEST }}
+
+      - name: Clean up
+        run: |
+          oc delete -f ${{ env.TEST_MANIFEST }}

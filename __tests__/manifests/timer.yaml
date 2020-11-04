@@ -1,0 +1,14 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: timer
+spec:
+  template:
+    spec:
+      containers:
+      - name: timer
+        image: docker.io/tetchel/timer:latest
+        command: [ "python", "/timer.py", "10" ]
+        tty: true
+      restartPolicy: OnFailure
+  backoffLimit: 4

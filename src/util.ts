@@ -1,13 +1,11 @@
 
-import * as os from "os";
-
 type OS = "linux" | "macos" | "windows";
 
 let currentOS: OS;
 
 export function getOS(): OS {
     if (currentOS == null) {
-        const rawOS = os.platform();
+        const rawOS = process.platform;
         if (rawOS === "win32") {
             currentOS = "windows";
         }

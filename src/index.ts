@@ -4,8 +4,8 @@ import Auth from "./auth";
 import { Inputs, Outputs } from './inputs-outputs';
 import KubeConfig from "./kubeconfig";
 
-async function main() {
-    const openshiftUrl = ghCore.getInput(Inputs.OS_SERVER_URL);
+async function run() {
+    const openshiftUrl = ghCore.getInput(Inputs.OS_SERVER_URL, { required: true });
 
     if (openshiftUrl) {
         ghCore.debug("Found Openshift URL");
@@ -16,16 +16,15 @@ async function main() {
 
     await Auth.login(openshiftUrl, Auth.getAuthInputs());
 
-    const kubeconfig = await KubeConfig.getKubeConfig();
-    ghCore.setOutput(Outputs.KUBECONFIG, kubeconfig);
-    ghCore.info(`Saved output "${Outputs.KUBECONFIG}"`);
+    if (ghCore.getInput(Inputs.SKIP_KUBECONFIG) != "true") {
+        const kubeConfigPath = await KubeConfig.exportKubeConfig();
+        ghCore.setOutput(Outputs.KUBECONFIG, kubeConfigPath);
+    }
 }
 
-main()
+run()
 .then(() => {
     // success
     ghCore.info("Success.");
-}).catch((err) => {
-    ghCore.setFailed(err.message || err);
-    process.exit(1);
-});
+})
+.catch(ghCore.setFailed);
