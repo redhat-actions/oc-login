@@ -18,10 +18,12 @@ jobs:
 
       - name: Authenticate and set context
         id: auth
-        uses: tetchel/first-action@master
+        uses: redhat-actions/oc-login@master
         with:
-          openshift_server_url: ${{ secrets.OPENSHIFT_URL }}
-          openshift_token: ${{ secrets.OPENSHIFT_TOKEN }}
+          openshift_server_url: ${{ secrets.TEST_OPENSHIFT_URL }}
+          # openshift_token: ${{ secrets.TEST_OPENSHIFT_TOKEN }}
+          openshift_username: ${{ secrets.TEST_OPENSHIFT_USERNAME }}
+          openshift_password: ${{ secrets.TEST_OPENSHIFT_PASSWORD }}
           insecure_skip_tls_verify: true
           namespace: ${{ env.TEST_NAMESPACE }}
 

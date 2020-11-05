@@ -1,6 +1,6 @@
 {
-  "name": "first-action",
-  "version": "1.0.0",
+  "name": "oc-login",
+  "version": "0.0.1",
   "engines": {
     "node": "12"
   },
