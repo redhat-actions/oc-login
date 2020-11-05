@@ -20,7 +20,7 @@ namespace Auth {
     /**
      * Get the token or credentials action inputs and return them in one object.
      */
-    export function getAuthInputs(): OSAuthInfo {
+    function getAuthInputs(): OSAuthInfo {
         const serverURL = ghCore.getInput(Inputs.OPENSHIFT_SERVER_URL, { required: true });
 
         if (serverURL) {
@@ -65,40 +65,41 @@ namespace Auth {
     }
 
     /**
-     * Performs an 'oc login' into the given server, with the given access token or credentials.
+     * Performs an 'oc login' into the given server, with the access token or credentials provided in the action inputs.
      * Token is given precedence if both are present.
+     *
+     * @throws If the login returns non-zero.
      */
-    export async function login(auth: OSAuthInfo): Promise<void> {
+    export async function login(): Promise<void> {
+        const authInputs = getAuthInputs();
+
         let authOptions: Oc.Options;
-        if (auth.token) {
+        if (authInputs.token) {
             ghCore.info("Authenticating using token");
             authOptions = {
-                token: auth.token
+                token: authInputs.token
             }
         }
-        else if (auth.credentials) {
+        else if (authInputs.credentials) {
             ghCore.info("Authenticating using credentials");
 
             authOptions = {
-                username: auth.credentials?.username,
-                password: auth.credentials?.password,
+                username: authInputs.credentials?.username,
+                password: authInputs.credentials?.password,
             }
         }
         else {
             throw new Error("Neither a token nor credentials was provided.");
         }
 
-        authOptions[Oc.Flags.ServerURL] = auth.serverURL;
+        authOptions[Oc.Flags.ServerURL] = authInputs.serverURL;
 
-        if (auth.skipTlsVerify) {
+        if (authInputs.skipTlsVerify) {
             authOptions[Oc.Flags.SkipTLSVerify] = "";
         }
 
         const ocExecArgs = [ Oc.Commands.Login, ...Oc.getOptions(authOptions) ];
-        const exitCode = (await Oc.exec(ocExecArgs)).exitCode;
-        if (exitCode != 0) {
-            throw new Error(`Authentication failed with exit code ${exitCode}`);
-        }
+        await Oc.exec(ocExecArgs);
     }
 }
 

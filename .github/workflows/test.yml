@@ -5,6 +5,8 @@ jobs:
   auth:
     name: OpenShift Login and Test
     runs-on: ubuntu-18.04
+    env:
+      TEST_USER: tetchell
 
     steps:
       - name: Checkout
@@ -18,5 +20,7 @@ jobs:
         uses: redhat-actions/oc-login@master
         with:
           openshift_server_url: ${{ secrets.TEST_OPENSHIFT_URL }}
-          openshift_token: ${{ secrets.TEST_OPENSHIFT_TOKEN }}
+          # openshift_token: ${{ secrets.TEST_OPENSHIFT_TOKEN }}
+          openshift_username: ${{ env.TEST_USER }}
+          openshift_password: ${{ secrets.TEST_OPENSHIFT_PASSWORD }}
           insecure_skip_tls_verify: true

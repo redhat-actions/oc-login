@@ -7,6 +7,7 @@ jobs:
     runs-on: ubuntu-18.04
     env:
       TEST_MANIFEST: __tests__/manifests/timer.yaml
+      TEST_USER: tetchell
       TEST_NAMESPACE: tetchell-dev
 
     steps:
@@ -22,7 +23,7 @@ jobs:
         with:
           openshift_server_url: ${{ secrets.TEST_OPENSHIFT_URL }}
           # openshift_token: ${{ secrets.TEST_OPENSHIFT_TOKEN }}
-          openshift_username: ${{ secrets.TEST_OPENSHIFT_USERNAME }}
+          openshift_username: ${{ env.TEST_USER }}
           openshift_password: ${{ secrets.TEST_OPENSHIFT_PASSWORD }}
           insecure_skip_tls_verify: true
           namespace: ${{ env.TEST_NAMESPACE }}

@@ -7,7 +7,39 @@ import * as path from "path";
 import * as fs from "fs";
 import { promisify } from "util";
 import * as ghCore from "@actions/core";
+import * as jsYaml from "js-yaml";
 import Oc from "./oc";
+
+type KubeConfigUser = Readonly<{
+    "client-certificate-data"?: string;
+    "client-key-data"?: string;
+    token?: string;
+}>
+
+type KubeConfig = Readonly<{
+    apiVersion: string;
+    clusters: [{
+        cluster: {
+            server: string;
+        }
+        name: string;
+    }];
+    contexts: [{
+        context: {
+            cluster: string;
+            namespace?: string;
+            user: string;
+        };
+        name: string;
+    }];
+    "current-context"?: string;
+    kind: string;
+    // preferences: {}
+    users: [{
+        name: string;
+        user: KubeConfigUser;
+    }]
+}>
 
 namespace KubeConfig {
 
@@ -20,20 +52,41 @@ namespace KubeConfig {
      *
      * @param namespace Set the current context's namespace to this, if set.
      */
-    export async function exportKubeConfig(): Promise<void> {
+    export async function exportKubeConfig(): Promise<string> {
 
         // TODO make this path configurable through env or input.
         const kubeConfigPath = path.resolve(process.cwd(), KUBECONFIG_FILENAME);
 
-        const kubeConfig = await getKubeConfig();
+        const kubeConfigRaw = await getKubeConfig();
 
-        ghCore.info(`Writing out kubeconfig to ${kubeConfigPath}`);
-        await promisify(fs.writeFile)(kubeConfigPath, kubeConfig);
+        let kubeConfig = jsYaml.safeLoad(kubeConfigRaw) as KubeConfig | undefined;
+        if (kubeConfig == null) {
+            throw new Error(`Could not load Kubeconfig as yaml`);
+        }
+        kubeConfig = kubeConfig as KubeConfig;
+
+        kubeConfig.users.forEach((user) => {
+            const secretKeys: (keyof KubeConfigUser)[] = [ "client-certificate-data", "client-key-data", "token" ];
+            secretKeys.forEach((key) => {
+                const value = user.user[key]
+                if (value) {
+                    ghCore.info(`Masking ${key}`);
+                    ghCore.setSecret(value);
+                }
+            })
+        });
+
+        ghCore.info(`Writing out Kubeconfig to ${kubeConfigPath}`);
+        await promisify(fs.writeFile)(kubeConfigPath, kubeConfigRaw);
+
+        ghCore.startGroup("Kubeconfig contents");
+        ghCore.info(kubeConfigRaw);
+        ghCore.endGroup();
 
         ghCore.info(`Exporting ${KUBECONFIG_ENVVAR}=${kubeConfigPath}`)
         ghCore.exportVariable(KUBECONFIG_ENVVAR, kubeConfigPath);
 
-        // return kubeConfigPath;
+        return kubeConfigPath;
     }
 
     /**
@@ -42,7 +95,8 @@ namespace KubeConfig {
     async function getKubeConfig(): Promise<string> {
         const ocOptions = Oc.getOptions({ flatten: "", minify: "true" });
 
-        const execResult = await Oc.exec([ Oc.Commands.Config, Oc.Commands.View, ...ocOptions ], { failOnStdErr: true });
+        // This must be executed silently since the secrets are not yet known to the action, and have not yet been masked.
+        const execResult = await Oc.exec([ Oc.Commands.Config, Oc.Commands.View, ...ocOptions ], { silent: true, failOnStdErr: true });
         return execResult.out;
     }
 

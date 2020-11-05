@@ -9,7 +9,7 @@ import { Inputs } from './generated/inputs-outputs';
 import KubeConfig from "./kubeconfig";
 
 async function run() {
-    await Auth.login(Auth.getAuthInputs());
+    await Auth.login();
 
     const namespace = ghCore.getInput(Inputs.NAMESPACE);
     if (namespace) {

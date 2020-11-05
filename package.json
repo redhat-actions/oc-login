@@ -4,7 +4,11 @@
   "engines": {
     "node": "12"
   },
-  "description": "",
+  "description": "GitHub Action to log in to an OpenShift cluster and set Kubernetes context.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/redhat-actions/oc-login"
+  },
   "main": "dist/index.js",
   "scripts": {
     "compile": "tsc -p .",
@@ -18,13 +22,13 @@
   "dependencies": {
     "@actions/core": "^1.2.6",
     "@actions/exec": "^1.0.4",
-    "@actions/github": "^4.0.0"
+    "@actions/github": "^4.0.0",
+    "js-yaml": "^3.14.0"
   },
   "devDependencies": {
     "@types/js-yaml": "^3.12.5",
     "@types/node": "12",
     "@vercel/ncc": "^0.24.1",
-    "js-yaml": "^3.14.0",
     "ts-node": "^9.0.0",
     "typescript": "^4.0.5"
   }
