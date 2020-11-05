@@ -2,20 +2,26 @@
  *  Copyright (c) Red Hat, Inc. All rights reserved.
  *  Licensed under the MIT License. See LICENSE file in the project root for license information.
  *************************************************************************************************/
+import * as path from "path";
+import * as fs from "fs";
+import { promisify } from "util"
 import * as ghCore from "@actions/core";
+
 import { Inputs } from './generated/inputs-outputs';
 import Oc from './oc';
+import { getTmpDir } from "./utils";
 
 namespace Auth {
-    interface OSAuthInfo {
+    type OSAuthInfo = Readonly<{
         serverURL: string;
         credentials?: {
             username: string;
             password: string;
         },
         token?: string;
+        certAuthorityData?: string;
         skipTlsVerify: boolean;
-    }
+    }>
 
     /**
      * Get the token or credentials action inputs and return them in one object.
@@ -27,10 +33,12 @@ namespace Auth {
             ghCore.debug("Found OpenShift Server URL");
         }
 
+        const caData = ghCore.getInput(Inputs.CERTIFICATE_AUTHORITY_DATA);
         const skipTlsVerify = ghCore.getInput(Inputs.INSECURE_SKIP_TLS_VERIFY) == "true";
 
         const authInfo: OSAuthInfo = {
             serverURL,
+            certAuthorityData: caData,
             skipTlsVerify,
         };
 
@@ -64,6 +72,21 @@ namespace Auth {
         );
     }
 
+    const CA_FILE = "openshift-ca.crt";
+
+    /**
+     * Write out `caData` to a .crt file.
+     * @returns The path to the .crt file.
+     */
+    async function writeOutCA(caData: string): Promise<string> {
+        const caOutFile = path.join(getTmpDir(), CA_FILE);
+
+        ghCore.info(`Writing out certificate authority data to ${caOutFile}`);
+        await promisify(fs.writeFile)(caOutFile, caData);
+
+        return caOutFile;
+    }
+
     /**
      * Performs an 'oc login' into the given server, with the access token or credentials provided in the action inputs.
      * Token is given precedence if both are present.
@@ -74,6 +97,7 @@ namespace Auth {
         const authInputs = getAuthInputs();
 
         let authOptions: Oc.Options;
+
         if (authInputs.token) {
             ghCore.info("Authenticating using token");
             authOptions = {
@@ -96,6 +120,11 @@ namespace Auth {
 
         if (authInputs.skipTlsVerify) {
             authOptions[Oc.Flags.SkipTLSVerify] = "";
+        }
+
+        if (authInputs.certAuthorityData) {
+            const caPath = await writeOutCA(authInputs.certAuthorityData);
+            authOptions[Oc.Flags.CertificateAuthority] = caPath;
         }
 
         const ocExecArgs = [ Oc.Commands.Login, ...Oc.getOptions(authOptions) ];

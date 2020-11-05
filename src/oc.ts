@@ -4,7 +4,7 @@
  *************************************************************************************************/
 
 import * as ghExec from "@actions/exec";
-import * as util from "./util";
+import * as util from "./utils";
 
 const EXECUTABLE = util.getOS() === "windows" ? "oc.exe" : "oc";
 
@@ -24,10 +24,11 @@ namespace Oc {
      */
     export enum Flags {
         ServerURL = "server",
+        Token = "token",
         Username = "username",
         Password = "password",
-        Token = "token",
         SkipTLSVerify = "insecure-skip-tls-verify",
+        CertificateAuthority = "certificate-authority",
 
         Flatten = "flatten",
         Minify = "minify",
@@ -76,28 +77,32 @@ namespace Oc {
 
         // ghCore.info(`${EXECUTABLE} ${args.join(" ")}`)
 
-        let out = "";
-        let err = "";
+        let stdout = "";
+        let stderr = "";
         const exitCode = await ghExec.exec(EXECUTABLE, args, {
             ...execOptions,
+            ignoreReturnCode: true,     // the return code is processed below
             listeners: {
                 stdline: (line) => {
-                    out += line + "\n";
+                    stdout += line + "\n";
                 },
                 errline: (line) => {
-                    err += line + "\n"
+                    stderr += line + "\n"
                 }
             }
         });
 
-        if (exitCode !== 0) {
-            // the command and err are already present in the action output (unless execOptions.silent is set).
-            const error = `Error: oc exited with code ${exitCode}`;
+        if (!execOptions.ignoreReturnCode && exitCode !== 0) {
+            // Throwing the stderr as part of the Error makes the stderr show up in the action outline, which saves some clicking when debugging.
+            let error = `oc exited with code ${exitCode}`;
+            if (stderr) {
+                error += `\n${stderr}`;
+            }
             throw new Error(error)
         }
 
         return {
-            exitCode, out, err
+            exitCode, out: stdout, err: stderr
         };
     }
 

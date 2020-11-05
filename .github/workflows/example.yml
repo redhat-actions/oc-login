@@ -26,6 +26,7 @@ jobs:
           openshift_username: ${{ env.TEST_USER }}
           openshift_password: ${{ secrets.TEST_OPENSHIFT_PASSWORD }}
           insecure_skip_tls_verify: true
+          # certificate_authority_data: ${{ secrets.CA_DATA }}
           namespace: ${{ env.TEST_NAMESPACE }}
 
       - name: Deploy

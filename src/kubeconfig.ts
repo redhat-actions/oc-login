@@ -9,6 +9,7 @@ import { promisify } from "util";
 import * as ghCore from "@actions/core";
 import * as jsYaml from "js-yaml";
 import Oc from "./oc";
+import { getTmpDir } from "./utils";
 
 type KubeConfigUser = Readonly<{
     "client-certificate-data"?: string;
@@ -55,7 +56,7 @@ namespace KubeConfig {
     export async function exportKubeConfig(): Promise<string> {
 
         // TODO make this path configurable through env or input.
-        const kubeConfigPath = path.resolve(process.cwd(), KUBECONFIG_FILENAME);
+        const kubeConfigPath = path.resolve(getTmpDir(), KUBECONFIG_FILENAME);
 
         const kubeConfigRaw = await getKubeConfig();
 
@@ -70,7 +71,7 @@ namespace KubeConfig {
             secretKeys.forEach((key) => {
                 const value = user.user[key]
                 if (value) {
-                    ghCore.info(`Masking ${key}`);
+                    ghCore.debug(`Masking ${key}`);
                     ghCore.setSecret(value);
                 }
             })

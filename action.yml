@@ -5,18 +5,22 @@ inputs:
   openshift_server_url:
     description: 'Openshift Server URL.'
     required: true
-  insecure_skip_tls_verify:
-    description: 'Skip TLS certificate verification when connecting to the cluster.'
-    required: false
-    default: 'false'
+
   openshift_token:
-    description: 'Openshift Bearer Token.'
+    description: 'Openshift Bearer Token. Store in a secret.'
     required: false
   openshift_username:
     description: 'Openshift Username. Must be used with openshift_password.'
     required: false
   openshift_password:
-    description: 'Openshift Password. Must be used with openshift_username.'
+    description: 'Openshift Password. Store in a secret. Must be used with openshift_username.'
+    required: false
+  insecure_skip_tls_verify:
+    description: 'Skip TLS certificate verification when connecting to the cluster.'
+    required: false
+    default: 'false'
+  certificate_authority_data:
+    description: "Contents of a Certificate Authority (.crt) file for your cluster's SSL certificate. Store in a secret."
     required: false
 
   ##### Inputs for kubeconfig
