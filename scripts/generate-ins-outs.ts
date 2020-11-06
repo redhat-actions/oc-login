@@ -10,6 +10,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { promisify } from "util";
 import * as jsYaml from "js-yaml";
+import * as minimist from "minimist";
 
 type InputOrOutput = Readonly<{
     description: string;
@@ -19,6 +20,8 @@ type InputOrOutput = Readonly<{
 type InputsOutputs = Readonly<{
     [key: string]: InputOrOutput;
 }>
+
+type InputOutputEntries = [string, InputOrOutput][];
 
 type ActionYml = Readonly<{
     name: string;
@@ -56,14 +59,7 @@ function enumify(enumName: string, inputsOrOutputs: [string, InputOrOutput][]) {
     }, `export enum ${enumName} {\n`) + `}\n`;
 }
 
-(async function() {
-    const actionYml = await loadActionYml();
-
-    const inputs = Object.entries(actionYml.inputs || []);
-    const outputs = Object.entries(actionYml.outputs || []);
-
-    console.log(`Found ${inputs.length} inputs and ${outputs.length} outputs.`);
-
+async function outputEnums(outFile: string, inputs: InputOutputEntries, outputs: InputOutputEntries): Promise<void> {
     let outputFileContents =
 `/*************************************************************************************************
  *  Copyright (c) Red Hat, Inc. All rights reserved.
@@ -77,16 +73,31 @@ function enumify(enumName: string, inputsOrOutputs: [string, InputOrOutput][]) {
     outputFileContents += `\n`;
     outputFileContents += enumify("Outputs", outputs);
 
-    let outputFile = process.argv[2];
-    if (!outputFile) {
-        outputFile = path.resolve(__dirname, "..", "src", "generated", "inputs-outputs.ts");
+    console.log(`Outputting input and output enums to ${outFile}`);
+    await promisify(fs.writeFile)(outFile, outputFileContents);
+}
+
+async function main() {
+    const actionYml = await loadActionYml();
+
+    const inputs = Object.entries(actionYml.inputs || []);
+    const outputs = Object.entries(actionYml.outputs || []);
+
+    console.log(`Found ${inputs.length} inputs and ${outputs.length} outputs.`);
+
+    const args = minimist(process.argv.slice(2));
+
+    let outFile = args.outFile;
+    if (!outFile) {
+        outFile = path.resolve(__dirname, "..", "src", "generated", "inputs-outputs.ts");
     }
 
-    console.log(`Outputting inputs and outputs to ${outputFile}`);
-    await promisify(fs.writeFile)(outputFile, outputFileContents);
-})()
+    await outputEnums(outFile, inputs, outputs);
+}
+
+main()
 .then(() => {
-    console.log(`Success`);
+    console.log(`Success.`);
 })
 .catch((err) => {
     console.error(err);

@@ -18,9 +18,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Generate
+      - name: Generate inputs and outputs
         run: |
-          npm run generate-ins-outs -- '${{ env.GENERATED_FILENAME }}'
+          npm run generate-ins-outs -- --outFile='${{ env.GENERATED_FILENAME }}'
 
       - name: Test equivalence
         run: git --no-pager diff --no-index --exit-code '${{ env.COMMITTED_FILENAME }}' '${{ env.GENERATED_FILENAME }}'
@@ -35,7 +35,6 @@ jobs:
           echo "---- Contents of ${{ env.COMMITTED_FILENAME }} -----"
           cat '${{ env.COMMITTED_FILENAME }}'
           echo "---- End Contents -----"
-
 
   check-dist:
     name: Check Distribution

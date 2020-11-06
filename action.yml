@@ -1,5 +1,5 @@
-name: 'OpenShift Authenticator'
-description: 'Authenticates against openshift :)'
+name: 'oc login'
+description: 'Logs into an OpenShift cluster using oc, and sets up the current context.'
 inputs:
   ##### Inputs for login
   openshift_server_url:
@@ -28,8 +28,7 @@ inputs:
     description: 'Do not generate kubeconfig or export its path.'
     required: false
   namespace:
-    description: >
-      Set current context's namespace to this, after logging in.
+    description: "Set current context's namespace to this, after logging in."
     required: false
 
 # outputs:
