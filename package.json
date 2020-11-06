@@ -9,6 +9,9 @@
     "type": "git",
     "url": "https://github.com/redhat-actions/oc-login"
   },
+  "bugs": {
+    "url": "https://github.com/redhat-actions/oc-login/issues"
+  },
   "main": "dist/index.js",
   "scripts": {
     "compile": "tsc -p .",

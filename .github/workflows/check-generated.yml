@@ -1,4 +1,4 @@
-name: Verify Generated Code Matches
+name: Check Generated Code
 on: [ push, pull_request ]
 jobs:
   check-inputs-outputs:

@@ -1,3 +1,98 @@
-# oc login
+# oc-login
 
-`oc-login` is a GitHub action to log into an OpenShift cluster, and preserve that Kubernetes context for the remainder of the job.
+[![example test badge](https://img.shields.io/github/workflow/status/redhat-actions/oc-login/OpenShift%20Authentication%20Example?label=example%20workflow)](https://github.com/redhat-actions/oc-login/actions?query=workflow%3A%22OpenShift+Authentication+Example%22)
+[![generated test badge](https://img.shields.io/github/workflow/status/redhat-actions/oc-login/Check%20Generated%20Code?label=check%20generated%20code)](https://github.com/redhat-actions/oc-login/actions?query=workflow%3A%22Check+Generated+Code%22)
+<br><br>
+[![tag badge](https://img.shields.io/github/v/tag/redhat-actions/oc-login?sort=semver)](https://github.com/redhat-actions/oc-login/tags)
+[![license badge](https://img.shields.io/github/license/redhat-actions/oc-login)](./LICENSE)
+[![size badge](https://img.shields.io/github/size/redhat-actions/oc-login/dist/index.js)](./dist)
+
+`oc-login` is a GitHub Action to log into an OpenShift cluster, and preserve that Kubernetes context for the remainder of the job.
+
+See the [OpenShift Documentation](https://docs.openshift.com/enterprise/3.0/dev_guide/authentication.html) for an explanation of a log in using `oc`, which this action wraps.
+
+## Getting Started with the Action (or, [see example](#example-workflow-step))
+
+1. `oc` must be installed on the GitHub Action runner you specify in `runs-on`.
+
+    - Presently the [Ubuntu Environments](https://github.com/actions/virtual-environments#available-environments) come with `oc 4.6.0` installed.
+    - If you want a different version of `oc`, or if you are using the Mac or Windows environments, use the `oc-installer` action to install `oc` before running this action.
+
+2. Find your OpenShift Server URL.
+    - If you have already performed an `oc login` locally, run `oc config view` and find the `cluster.server` property for the cluster you wish to use.
+    - Otherwise, in the Web Console, click your profile name, then **Copy Login Commmand**. The `--server` option contains the OpenShift server URL.
+    - At this time, the cluster must be available on the internet, so the Action runner can access it.
+
+3. Decide how you are going to log into the OpenShift server from the action.
+    - The recommended approach is to [create a functional Service Account and use its token](https://github.com/redhat-actions/oc-login/wiki/Using-a-Service-Account-for-GitHub-Actions).
+    - You can also use a personal token, which can be fetched from `oc config view` or from the Web Console using the same steps detailed in Step 2.
+      - However, these tokens generally expire after 12 or 24 hours, depending on how your cluster is configured.
+    - You can also use your personal username and password.
+
+4. Determine how you are going to manage SSL/TLS certificate verification.
+    - If your cluster uses self-signed certificates (which is the default), the GitHub runner will not recognize the certificate and will not allow you to issue HTTPS requests.
+    - The easiest way to get around this is to set the `insecure_skip_tls_verify` input to `true`.
+    - You can also obtain the self-signed certificate data (from a `.crt` file) and use the `certificate_authority_data` input.
+
+5. Store the Server URL and any credentials (passwords, tokens, or certificates) in GitHub Secrets.
+    - [Refer to the GitHub documentation](https://docs.github.com/en/free-pro-team@latest/actions/reference/encrypted-secrets).
+    - You can name them anything you like. See below for an example.
+
+6. Create your workflow.
+
+## Example Workflow Step
+- Refer to [`action.yml`](./action.yml) for the full list of inputs.
+- Also see the [example workflow](./.github/workflows/example.yml).
+
+```yaml
+steps:
+  - name: Authenticate and set context
+    uses: redhat-actions/oc-login@v0.0.1
+    env:
+      OPENSHIFT_USER: my-username
+      OPENSHIFT_NAMESPACE: my-namespace
+
+    with:
+      # URL to your OpenShift cluster.
+      # Refer to Step 2.
+      openshift_server_url: ${{ secrets.OPENSHIFT_URL }}
+
+      # Authentication Token. Can use username and password instead.
+      # Refer to Step 3.
+      openshift_token: ${{ secrets.OPENSHIFT_TOKEN }}
+
+      # Credentials if desired instead of Token.
+      # Token overrides username and password if all 3 are set.
+      openshift_username: ${{ env.OPENSHIFT_USER }}
+      openshift_password: ${{ secrets.OPENSHIFT_PASSWORD }}
+
+      # This disables SSL certificate checking. Use this if you don't have the certificate authority data.
+      insecure_skip_tls_verify: true
+      # This method is more secure, if the certificate from Step 4 is available.
+      certificate_authority_data: ${{ secrets.CA_DATA }}
+
+      # Optional - this sets your Kubernetes context's current namespace after logging in.
+      namespace: ${{ env.OPENSHIFT_NAMESPACE }}
+```
+## Result
+If the `oc-login` step succeeds:
+- The Kubernetes config generated by `oc` will be saved into a file
+- The `KUBECONFIG` environment variable will be set to that file
+- The rest of the job will have access to the Kubernetes context, so you can run any `oc` or `kubectl` commands you like.
+
+Note that if you start another `job`, the new job will use a new container, and you will have to run this action again.
+
+
+## Contributing
+Anyone can contribute to this project.
+
+This project uses a pre-commit hook to ensure consistency between the source code and distribution, as well as between the source code and `action.yml`. This is verified by the `Check Generated Code` action.
+
+After cloning this repository, install the hooks by running:
+
+```sh
+cd oc-login/
+cp -r scripts/git-hooks/ .git/hooks/
+```
+
+Then run `npm ci` to install dependencies, and you should be ready to develop.
