@@ -42,16 +42,6 @@ namespace Auth {
             skipTlsVerify,
         };
 
-        const openshiftToken = ghCore.getInput(Inputs.OPENSHIFT_TOKEN);
-        if (openshiftToken) {
-            ghCore.debug("Found OpenShift Token");
-            return {
-                ...authInfo,
-                token: openshiftToken,
-            };
-        }
-
-        // no token - proceed to username/password
         const openshiftUsername = ghCore.getInput(Inputs.OPENSHIFT_USERNAME);
         const openshiftPassword = ghCore.getInput(Inputs.OPENSHIFT_PASSWORD);
 
@@ -63,6 +53,16 @@ namespace Auth {
                     username: openshiftUsername,
                     password: openshiftPassword
                 },
+            };
+        }
+
+        // no credentials - proceed to token
+        const openshiftToken = ghCore.getInput(Inputs.OPENSHIFT_TOKEN);
+        if (openshiftToken) {
+            ghCore.debug("Found OpenShift Token");
+            return {
+                ...authInfo,
+                token: openshiftToken,
             };
         }
 

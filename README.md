@@ -16,7 +16,7 @@ See the [OpenShift Documentation](https://docs.openshift.com/enterprise/3.0/dev_
 1. `oc` must be installed on the GitHub Action runner you specify in `runs-on`.
 
     - Presently the [Ubuntu Environments](https://github.com/actions/virtual-environments#available-environments) come with `oc 4.6.0` installed.
-    - If you want a different version of `oc`, or if you are using the Mac or Windows environments, use the `oc-installer` action to install `oc` before running this action.
+    - If you want a different version of `oc`, or if you are using the Mac or Windows environments, use the [`oc-installer`](https://github.com/redhat-actions/oc-installer) action to install `oc` before running this action.
 
 2. Find your OpenShift Server URL.
     - If you have already performed an `oc login` locally, run `oc config view` and find the `cluster.server` property for the cluster you wish to use.
@@ -27,10 +27,10 @@ See the [OpenShift Documentation](https://docs.openshift.com/enterprise/3.0/dev_
     - The recommended approach is to [create a functional Service Account and use its token](https://github.com/redhat-actions/oc-login/wiki/Using-a-Service-Account-for-GitHub-Actions).
     - You can also use a personal token, which can be fetched from `oc config view` or from the Web Console using the same steps detailed in Step 2.
       - However, these tokens generally expire after 12 or 24 hours, depending on how your cluster is configured.
-    - You can also use your personal username and password.
+    - You can also use your personal credentials (username and password).
+    - If both token and credentials are provided, the credentials take precedence and the token is ignored.
 
-4. Determine how you are going to manage SSL/TLS certificate verification.
-    - If your cluster uses self-signed certificates (which is the default), the GitHub runner will not recognize the certificate and will not allow you to issue HTTPS requests.
+4. Determine how you are going to manage SSL/TLS certificate verification. If your cluster uses self-signed certificates (which is the default), the GitHub runner will not recognize the certificate and will not allow you to issue HTTPS requests.
     - The easiest way to get around this is to set the `insecure_skip_tls_verify` input to `true`.
     - You can also obtain the self-signed certificate data (from a `.crt` file) and use the `certificate_authority_data` input.
 
@@ -49,6 +49,7 @@ steps:
   - name: Authenticate and set context
     uses: redhat-actions/oc-login@v0.0.1
     env:
+      # These can be stored in secrets, if desired.
       OPENSHIFT_USER: my-username
       OPENSHIFT_NAMESPACE: my-namespace
 
@@ -61,8 +62,8 @@ steps:
       # Refer to Step 3.
       openshift_token: ${{ secrets.OPENSHIFT_TOKEN }}
 
-      # Credentials if desired instead of Token.
-      # Token overrides username and password if all 3 are set.
+      # Credentials, if desired instead of token.
+      # Username and password override token if they are set.
       openshift_username: ${{ env.OPENSHIFT_USER }}
       openshift_password: ${{ secrets.OPENSHIFT_PASSWORD }}
 
