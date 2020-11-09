@@ -1,7 +1,7 @@
 # oc-login
 
-[![example test badge](https://img.shields.io/github/workflow/status/redhat-actions/oc-login/OpenShift%20Authentication%20Example?label=example%20workflow)](https://github.com/redhat-actions/oc-login/actions?query=workflow%3A%22OpenShift+Authentication+Example%22)
-[![generated test badge](https://img.shields.io/github/workflow/status/redhat-actions/oc-login/Check%20Generated%20Code?label=check%20generated%20code)](https://github.com/redhat-actions/oc-login/actions?query=workflow%3A%22Check+Generated+Code%22)
+[![Actions Status](https://github.com/redhat-actions/oc-login/workflows/OpenShift%20Authentication%20Example/badge.svg)](https://github.com/redhat-actions/oc-login/actions?query=workflow%3A%22OpenShift+Authentication+Example%22)
+[![Actions Status](https://github.com/redhat-actions/oc-login/workflows/Check%20Generated%20Code/badge.svg)](https://github.com/redhat-actions/oc-login/actions?query=workflow%3A%22Check+Generated+Code%22)
 <br><br>
 [![tag badge](https://img.shields.io/github/v/tag/redhat-actions/oc-login?sort=semver)](https://github.com/redhat-actions/oc-login/tags)
 [![license badge](https://img.shields.io/github/license/redhat-actions/oc-login)](./LICENSE)
@@ -19,7 +19,7 @@ See the [OpenShift Documentation](https://docs.openshift.com/enterprise/3.0/dev_
     - If you want a different version of `oc`, or if you are using the Mac or Windows environments, use the [`oc-installer`](https://github.com/redhat-actions/oc-installer) action to install `oc` before running this action.
 
 2. Find your OpenShift Server URL.
-    - If you have already performed an `oc login` locally, run `oc config view` and find the `cluster.server` property for the cluster you wish to use.
+    - If you have already performed an `oc login` locally, run `oc whoami --show-server`.
     - Otherwise, in the Web Console, click your profile name, then **Copy Login Commmand**. The `--server` option contains the OpenShift server URL.
     - At this time, the cluster must be available on the internet, so the Action runner can access it.
 

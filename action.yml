@@ -5,7 +5,7 @@ inputs:
   openshift_server_url:
     description: 'Openshift Server URL.'
     required: true
-
+  ### Authenticating
   openshift_token:
     description: 'Openshift Bearer Token. Store in a secret.'
     required: false
@@ -15,6 +15,7 @@ inputs:
   openshift_password:
     description: 'Openshift Password. Store in a secret. Must be used with openshift_username.'
     required: false
+  ### TLS Cert options
   insecure_skip_tls_verify:
     description: 'Skip TLS certificate verification when connecting to the cluster.'
     required: false
@@ -22,7 +23,6 @@ inputs:
   certificate_authority_data:
     description: "Contents of a Certificate Authority (.crt) file for your cluster's SSL certificate. Store in a secret."
     required: false
-
   ##### Inputs for kubeconfig
   skip_kubeconfig:
     description: 'Do not generate kubeconfig or export its path.'
@@ -30,8 +30,6 @@ inputs:
   namespace:
     description: "Set current context's namespace to this, after logging in."
     required: false
-
-# outputs:
 
 runs:
   using: 'node12'
