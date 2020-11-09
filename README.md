@@ -67,7 +67,7 @@ steps:
       openshift_username: ${{ env.OPENSHIFT_USER }}
       openshift_password: ${{ secrets.OPENSHIFT_PASSWORD }}
 
-      # This disables SSL certificate checking. Use this if you don't have the certificate authority data.
+      # Disables SSL cert checking. Use this if you don't have the certificate authority data.
       insecure_skip_tls_verify: true
       # This method is more secure, if the certificate from Step 4 is available.
       certificate_authority_data: ${{ secrets.CA_DATA }}

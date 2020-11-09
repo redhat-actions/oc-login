@@ -49,20 +49,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Hash committed distribution
-        run: |
-          echo "DIST_HASH=${{ hashFiles('dist/*') }}" >> $GITHUB_ENV
-
-      - name: Regenerate distribution
-        run: npm run bundle -- --out='action-dist'
-
-      - name: Hash regenerated distribution
-        run: |
-          echo "ACTION_DIST_HASH=${{ hashFiles('action-dist/*') }}" >> $GITHUB_ENV
-
-      - name: Check hashes match
-        run: |
-          echo "Committed dist hash is: \"$DIST_HASH\""
-          echo "Generated dist hash is: \"$ACTION_DIST_HASH\""
-          [[ $DIST_HASH == $ACTION_DIST_HASH ]]
-          echo "Success!"
+      - name: Check Distribution
+        uses: tetchel/bundle-verifier-action@v0.0.2
+        with:
+          bundle_file: dist/index.js
+          bundle_command: "npm run bundle"
