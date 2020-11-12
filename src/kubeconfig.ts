@@ -54,19 +54,15 @@ namespace KubeConfig {
      * @param namespace Set the current context's namespace to this, if set.
      */
     export async function exportKubeConfig(): Promise<string> {
-
-        // TODO make this path configurable through env or input.
-        const kubeConfigPath = path.resolve(getTmpDir(), KUBECONFIG_FILENAME);
-
         const kubeConfigRaw = await getKubeConfig();
 
-        let kubeConfig = jsYaml.safeLoad(kubeConfigRaw) as KubeConfig | undefined;
-        if (kubeConfig == null) {
+        let kubeConfigYml = jsYaml.safeLoad(kubeConfigRaw) as KubeConfig | undefined;
+        if (kubeConfigYml == null) {
             throw new Error(`Could not load Kubeconfig as yaml`);
         }
-        kubeConfig = kubeConfig as KubeConfig;
+        kubeConfigYml = kubeConfigYml as KubeConfig;
 
-        kubeConfig.users.forEach((user) => {
+        kubeConfigYml.users.forEach((user) => {
             const secretKeys: (keyof KubeConfigUser)[] = [ "client-certificate-data", "client-key-data", "token" ];
             secretKeys.forEach((key) => {
                 const value = user.user[key]
@@ -76,6 +72,9 @@ namespace KubeConfig {
                 }
             })
         });
+
+        // TODO make this path configurable through env or input.
+        const kubeConfigPath = path.resolve(getTmpDir(), KUBECONFIG_FILENAME);
 
         ghCore.info(`Writing out Kubeconfig to ${kubeConfigPath}`);
         await promisify(fs.writeFile)(kubeConfigPath, kubeConfigRaw);
@@ -96,8 +95,8 @@ namespace KubeConfig {
     async function getKubeConfig(): Promise<string> {
         const ocOptions = Oc.getOptions({ flatten: "", minify: "true" });
 
-        // This must be executed silently since the secrets are not yet known to the action, and have not yet been masked.
-        const execResult = await Oc.exec([ Oc.Commands.Config, Oc.Commands.View, ...ocOptions ], { silent: true, failOnStdErr: true });
+        // The stdout must be hidden since the secrets are not yet known to the action, and have not yet been masked.
+        const execResult = await Oc.exec([ Oc.Commands.Config, Oc.Commands.View, ...ocOptions ], { hideOutput: true });
         return execResult.out;
     }
 

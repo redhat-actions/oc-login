@@ -1,31 +1,48 @@
-name: oc-login Example
-on: [ push, workflow_dispatch ]
+name: Multiplatform Workflow
+on: [ workflow_dispatch ]
 
 jobs:
   login:
-    name: OpenShift Login and Test
-    runs-on: ubuntu-18.04
+    name: Multiplatform Workflow
+    strategy:
+      fail-fast: false
+      max-parallel: 1   # this is just to prevent concurrent modification of my k8s cluster.
+      matrix:
+        # os: [ ubuntu-latest, macos-latest, windows-latest ]
+        os: [ macos-latest, windows-latest ]
+    runs-on: ${{ matrix.os }}
     env:
       TEST_MANIFEST: __tests__/manifests/timer.yaml
       TEST_USER: tetchell
-      TEST_NAMESPACE: tetchell-dev
+      TEST_NAMESPACE: tetchell-stage
 
     steps:
+      - name: Install oc
+        if: "runner.os != 'Linux'"
+        uses: redhat-actions/oc-installer@v1
+
+      - name: Install kubectl
+        if: "runner.os != 'Linux'"
+        uses: azure/setup-kubectl@v1
+
+      - name: Verify Installs
+        run: |
+          oc version --client
+          kubectl version --client --short
+
       - name: Checkout
         uses: actions/checkout@v2
         env:
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Log in and set context
+      - name: Authenticate and set context
         uses: redhat-actions/oc-login@master
         with:
           openshift_server_url: ${{ secrets.TEST_OPENSHIFT_URL }}
-          # openshift_token: ${{ secrets.TEST_OPENSHIFT_TOKEN }}
           openshift_username: ${{ env.TEST_USER }}
           openshift_password: ${{ secrets.TEST_OPENSHIFT_PASSWORD }}
           insecure_skip_tls_verify: true
-          # certificate_authority_data: ${{ secrets.CA_DATA }}
           namespace: ${{ env.TEST_NAMESPACE }}
 
       - name: Deploy

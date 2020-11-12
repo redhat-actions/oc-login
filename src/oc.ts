@@ -3,7 +3,9 @@
  *  Licensed under the MIT License. See LICENSE file in the project root for license information.
  *************************************************************************************************/
 
+// import * as ghCore from "@actions/core";
 import * as ghExec from "@actions/exec";
+import CmdOutputHider from './cmdOutputHider';
 import * as util from "./utils";
 
 const EXECUTABLE = util.getOS() === "windows" ? "oc.exe" : "oc";
@@ -73,32 +75,42 @@ namespace Oc {
      * @param execOptions Options for how to run the exec.
      * @returns Exit code and the contents of stdout/stderr.
      */
-    export async function exec(args: string[], execOptions: ghExec.ExecOptions = {}): Promise<{ exitCode: number, out: string, err: string }> {
+    export async function exec(args: string[], execOptions: ghExec.ExecOptions & { hideOutput?: boolean } = {}): Promise<{ exitCode: number, out: string, err: string }> {
 
         // ghCore.info(`${EXECUTABLE} ${args.join(" ")}`)
 
         let stdout = "";
         let stderr = "";
-        const exitCode = await ghExec.exec(EXECUTABLE, args, {
-            ...execOptions,
-            ignoreReturnCode: true,     // the return code is processed below
-            listeners: {
-                stdline: (line) => {
-                    stdout += line + "\n";
-                },
-                errline: (line) => {
-                    stderr += line + "\n"
-                }
-            }
-        });
 
-        if (!execOptions.ignoreReturnCode && exitCode !== 0) {
+        const finalExecOptions = execOptions;
+        if (execOptions.hideOutput) {
+            const wrappedOutStream = execOptions.outStream || process.stdout;
+            finalExecOptions.outStream = new CmdOutputHider(wrappedOutStream, stdout);
+        }
+        finalExecOptions.ignoreReturnCode = true;     // the return code is processed below
+
+        finalExecOptions.listeners = {
+            stdline: (line) => {
+                stdout += line + "\n";
+            },
+            errline: (line) => {
+                stderr += line + "\n"
+            },
+        }
+
+        const exitCode = await ghExec.exec(EXECUTABLE, args, execOptions);
+
+        if (execOptions.ignoreReturnCode !== true && exitCode !== 0) {
             // Throwing the stderr as part of the Error makes the stderr show up in the action outline, which saves some clicking when debugging.
             let error = `oc exited with code ${exitCode}`;
             if (stderr) {
                 error += `\n${stderr}`;
             }
             throw new Error(error)
+        }
+
+        if (finalExecOptions.outStream instanceof CmdOutputHider) {
+            stdout = finalExecOptions.outStream.getContents();
         }
 
         return {

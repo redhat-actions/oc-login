@@ -7,8 +7,11 @@ import * as ghCore from "@actions/core";
 import Auth from "./auth";
 import { Inputs } from './generated/inputs-outputs';
 import KubeConfig from "./kubeconfig";
+import * as utils from "./utils";
 
 async function run() {
+    ghCore.debug(`Runner OS is ${utils.getOS()}`)
+    // ghCore.setCommandEcho(true);
     await Auth.login();
 
     const namespace = ghCore.getInput(Inputs.NAMESPACE);
@@ -20,6 +23,7 @@ async function run() {
         ghCore.info(`"${Inputs.SKIP_KUBECONFIG}" is set; skipping generating kubeconfig`);
     }
     else {
+        ghCore.info(`Exporting Kubeconfig`);
         await KubeConfig.exportKubeConfig();
     }
 }

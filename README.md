@@ -1,6 +1,6 @@
 # oc-login
 
-[![Actions Status](https://github.com/redhat-actions/oc-login/workflows/OpenShift%20Authentication%20Example/badge.svg)](https://github.com/redhat-actions/oc-login/actions?query=workflow%3A%22OpenShift+Authentication+Example%22)
+[![Actions Status](https://github.com/redhat-actions/oc-login/workflows/oc-login%20Example/badge.svg)](https://github.com/redhat-actions/oc-login/actions?query=workflow%3A%22oc-login+Example%22)
 [![Actions Status](https://github.com/redhat-actions/oc-login/workflows/Check%20Generated%20Code/badge.svg)](https://github.com/redhat-actions/oc-login/actions?query=workflow%3A%22Check+Generated+Code%22)
 <br><br>
 [![tag badge](https://img.shields.io/github/v/tag/redhat-actions/oc-login?sort=semver)](https://github.com/redhat-actions/oc-login/tags)
@@ -11,9 +11,11 @@
 
 See the [OpenShift Documentation](https://docs.openshift.com/enterprise/3.0/dev_guide/authentication.html) for an explanation of a log in using `oc`, which this action wraps.
 
+<a id="getting-started"></a>
+
 ## Getting Started with the Action (or, [see example](#example-workflow-step))
 
-1. `oc` must be installed on the GitHub Action runner you specify in `runs-on`.
+1. `oc` must be installed on the GitHub Action runner you specify.
 
     - Presently the [Ubuntu Environments](https://github.com/actions/virtual-environments#available-environments) come with `oc 4.6.0` installed.
     - If you want a different version of `oc`, or if you are using the Mac or Windows environments, use the [`oc-installer`](https://github.com/redhat-actions/oc-installer) action to install `oc` before running this action.
@@ -83,6 +85,10 @@ If the `oc-login` step succeeds:
 
 Note that if you start another `job`, the new job will use a new container, and you will have to run this action again.
 
+## Runner OS Support
+See the [multiplatform workflow](./.github/workflows/multiplatform.yml). All 3 runner operating systems are supported.
+
+See the note in [Step 1](#getting-started) regarding installing `oc` into the non-Ubuntu runners.
 
 ## Contributing
 Anyone can contribute to this project.
