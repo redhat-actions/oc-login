@@ -19,6 +19,7 @@ See the [OpenShift Documentation](https://docs.openshift.com/enterprise/3.0/dev_
 
     - Presently the [Ubuntu Environments](https://github.com/actions/virtual-environments#available-environments) come with `oc 4.6.0` installed.
     - If you want a different version of `oc`, or if you are using the Mac or Windows environments, use the [`oc-installer`](https://github.com/redhat-actions/oc-installer) action to install `oc` before running this action.
+      - See the [multiplatform example](./.github/workflows/multiplatform.yml)
 
 2. Find your OpenShift Server URL.
     - If you have already performed an `oc login` locally, run `oc whoami --show-server`.
@@ -44,7 +45,8 @@ See the [OpenShift Documentation](https://docs.openshift.com/enterprise/3.0/dev_
 
 ## Example Workflow Step
 - Refer to [`action.yml`](./action.yml) for the full list of inputs.
-- Also see the [example workflow](./.github/workflows/example.yml).
+- See the [example workflow](./.github/workflows/example.yml).
+- See the [multiplatform workflow](./.github/workflows/multiplatform.yml) for an example which installs `oc` and `kubectl` into the runner first.
 
 ```yaml
 steps:
