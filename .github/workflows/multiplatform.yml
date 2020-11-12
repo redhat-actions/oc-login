@@ -20,14 +20,18 @@ jobs:
       - name: Install oc
         if: "runner.os != 'Linux'"
         uses: redhat-actions/oc-installer@v1
+        with:
+          oc_version: latest
+
+      - name: Test oc
+        run: oc version --client
 
       - name: Install kubectl
         if: "runner.os != 'Linux'"
         uses: azure/setup-kubectl@v1
 
-      - name: Verify Installs
-        run: |
-          oc version --client
+      - name: Test kubectl
+        run:
           kubectl version --client --short
 
       - name: Checkout
