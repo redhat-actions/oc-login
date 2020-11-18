@@ -28,8 +28,11 @@ See the [OpenShift Documentation](https://docs.openshift.com/enterprise/3.0/dev_
 
 3. Decide how you are going to log into the OpenShift server from the action.
     - The recommended approach is to [create a functional Service Account and use its token](https://github.com/redhat-actions/oc-login/wiki/Using-a-Service-Account-for-GitHub-Actions).
-    - You can also use a personal token, which can be fetched from `oc config view` or from the Web Console using the same steps detailed in Step 2.
-      - However, these tokens generally expire after 12 or 24 hours, depending on how your cluster is configured.
+      - The primary advantage of Service Accounts is that by default, their tokens do not expire.
+    - You can also use a personal token.
+      - If you have already logged in locally, use `oc whoami --show-token`.
+      - Otherwise, you can retrieve your token from the Web Console, using the same steps as in Step 2.
+      - Personal tokens generally expire after 12 or 24 hours, depending on how your cluster is configured.
     - You can also use your personal credentials (username and password).
     - If both token and credentials are provided, the credentials take precedence and the token is ignored.
 
@@ -51,7 +54,7 @@ See the [OpenShift Documentation](https://docs.openshift.com/enterprise/3.0/dev_
 ```yaml
 steps:
   - name: Authenticate and set context
-    uses: redhat-actions/oc-login@v0.0.1
+    uses: redhat-actions/oc-login@v1
     env:
       # These can be stored in secrets, if desired.
       OPENSHIFT_USER: my-username
