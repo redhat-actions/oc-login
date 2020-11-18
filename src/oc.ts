@@ -19,6 +19,7 @@ namespace Oc {
         Config = "config",
         View = "view",
         Set_Context = "set-context",
+        Whoami = "whoami",
     }
 
     /**

@@ -129,6 +129,8 @@ namespace Auth {
 
         const ocExecArgs = [ Oc.Commands.Login, ...Oc.getOptions(authOptions) ];
         await Oc.exec(ocExecArgs);
+
+        await Oc.exec([ Oc.Commands.Whoami ]);
     }
 }
 
