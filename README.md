@@ -63,7 +63,7 @@ steps:
     with:
       # URL to your OpenShift cluster.
       # Refer to Step 2.
-      openshift_server_url: ${{ secrets.OPENSHIFT_URL }}
+      openshift_server_url: ${{ secrets.OPENSHIFT_SERVER }}
 
       # Authentication Token. Can use username and password instead.
       # Refer to Step 3.

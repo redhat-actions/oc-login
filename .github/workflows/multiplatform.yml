@@ -43,7 +43,7 @@ jobs:
       - name: Authenticate and set context
         uses: redhat-actions/oc-login@master
         with:
-          openshift_server_url: ${{ secrets.TEST_OPENSHIFT_URL }}
+          openshift_server_url: ${{ secrets.TEST_OPENSHIFT_SERVER }}
           openshift_username: ${{ env.TEST_USER }}
           openshift_password: ${{ secrets.TEST_OPENSHIFT_PASSWORD }}
           insecure_skip_tls_verify: true
