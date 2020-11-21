@@ -9,7 +9,6 @@ import * as ghCore from "@actions/core";
 
 import { Inputs } from './generated/inputs-outputs';
 import Oc from './oc';
-import { getTmpDir } from "./utils";
 
 namespace Auth {
     type OSAuthInfo = Readonly<{
@@ -79,7 +78,7 @@ namespace Auth {
      * @returns The path to the .crt file.
      */
     async function writeOutCA(caData: string): Promise<string> {
-        const caOutFile = path.join(getTmpDir(), CA_FILE);
+        const caOutFile = path.join(process.cwd(), CA_FILE);
 
         ghCore.info(`Writing out certificate authority data to ${caOutFile}`);
         await promisify(fs.writeFile)(caOutFile, caData);

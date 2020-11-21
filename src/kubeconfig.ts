@@ -9,7 +9,6 @@ import { promisify } from "util";
 import * as ghCore from "@actions/core";
 import * as jsYaml from "js-yaml";
 import Oc from "./oc";
-import { getTmpDir } from "./utils";
 
 type KubeConfigUser = Readonly<{
     "client-certificate-data"?: string;
@@ -74,10 +73,11 @@ namespace KubeConfig {
         });
 
         // TODO make this path configurable through env or input.
-        const kubeConfigPath = path.resolve(getTmpDir(), KUBECONFIG_FILENAME);
+        const kubeConfigPath = path.resolve(process.cwd(), KUBECONFIG_FILENAME);
 
         ghCore.info(`Writing out Kubeconfig to ${kubeConfigPath}`);
         await promisify(fs.writeFile)(kubeConfigPath, kubeConfigRaw);
+        await promisify(fs.chmod)(kubeConfigPath, '600');
 
         ghCore.startGroup("Kubeconfig contents");
         ghCore.info(kubeConfigRaw);
