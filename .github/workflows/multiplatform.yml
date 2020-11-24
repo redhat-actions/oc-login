@@ -14,7 +14,7 @@ jobs:
     env:
       TEST_MANIFEST: __tests__/manifests/timer.yaml
       TEST_USER: tetchell
-      TEST_NAMESPACE: tetchell-stage
+      TEST_NAMESPACE: tetchell-code
 
     steps:
       - name: Install oc
@@ -43,9 +43,8 @@ jobs:
       - name: Authenticate and set context
         uses: redhat-actions/oc-login@master
         with:
-          openshift_server_url: ${{ secrets.TEST_OPENSHIFT_SERVER }}
-          openshift_username: ${{ env.TEST_USER }}
-          openshift_password: ${{ secrets.TEST_OPENSHIFT_PASSWORD }}
+          openshift_server_url: ${{ secrets.OPENSHIFT_SERVER }}
+          openshift_token: ${{ secrets.OPENSHIFT_TOKEN }}
           insecure_skip_tls_verify: true
           namespace: ${{ env.TEST_NAMESPACE }}
 

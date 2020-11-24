@@ -7,23 +7,18 @@ jobs:
     runs-on: ubuntu-18.04
     env:
       TEST_MANIFEST: __tests__/manifests/timer.yaml
-      TEST_USER: tetchell
-      TEST_NAMESPACE: tetchell-dev
+      TEST_NAMESPACE: tetchell-code
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        env:
-          DEFAULT_BRANCH: main
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v2
 
       - name: Log in and set context
         uses: redhat-actions/oc-login@master
         with:
-          openshift_server_url: ${{ secrets.TEST_OPENSHIFT_SERVER }}
-          # openshift_token: ${{ secrets.TEST_OPENSHIFT_TOKEN }}
-          openshift_username: ${{ env.TEST_USER }}
-          openshift_password: ${{ secrets.TEST_OPENSHIFT_PASSWORD }}
+          openshift_server_url: ${{ secrets.OPENSHIFT_SERVER }}
+          openshift_token: ${{ secrets.OPENSHIFT_TOKEN }}
+          # openshift_username: ${{ env.TEST_USER }}
+          # openshift_password: ${{ secrets.OPENSHIFT_PASSWORD }}
           insecure_skip_tls_verify: true
           # certificate_authority_data: ${{ secrets.CA_DATA }}
           namespace: ${{ env.TEST_NAMESPACE }}
