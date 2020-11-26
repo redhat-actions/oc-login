@@ -83,7 +83,7 @@ namespace Oc {
         let stdout = "";
         let stderr = "";
 
-        const finalExecOptions = execOptions;
+        const finalExecOptions = { ...execOptions };
         if (execOptions.hideOutput) {
             const wrappedOutStream = execOptions.outStream || process.stdout;
             finalExecOptions.outStream = new CmdOutputHider(wrappedOutStream, stdout);
@@ -99,7 +99,7 @@ namespace Oc {
             },
         }
 
-        const exitCode = await ghExec.exec(EXECUTABLE, args, execOptions);
+        const exitCode = await ghExec.exec(EXECUTABLE, args, finalExecOptions);
 
         if (execOptions.ignoreReturnCode !== true && exitCode !== 0) {
             // Throwing the stderr as part of the Error makes the stderr show up in the action outline, which saves some clicking when debugging.
@@ -107,7 +107,7 @@ namespace Oc {
             if (stderr) {
                 error += `\n${stderr}`;
             }
-            throw new Error(error)
+            throw new Error(error);
         }
 
         if (finalExecOptions.outStream instanceof CmdOutputHider) {

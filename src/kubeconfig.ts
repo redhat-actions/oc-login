@@ -104,7 +104,7 @@ namespace KubeConfig {
         ghCore.info(`Set current context's namespace to "${namespace}"`);
         const ocOptions = Oc.getOptions({ current: "", namespace });
 
-        await Oc.exec([ Oc.Commands.Config, Oc.Commands.Set_Context, ...ocOptions ], { failOnStdErr: true });
+        await Oc.exec([ Oc.Commands.Config, Oc.Commands.Set_Context, ...ocOptions ]);
     }
 }
 
