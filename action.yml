@@ -1,5 +1,9 @@
 name: 'Openshift Login'
 description: 'Log into an OpenShift cluster and set up a Kubernetes context'
+author: 'Red Hat'
+branding:
+  icon: circle
+  color: red
 inputs:
   ##### Inputs for login
   openshift_server_url:
