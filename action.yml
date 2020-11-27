@@ -1,4 +1,4 @@
-name: 'oc login'
+name: 'Openshift Login'
 description: 'Log into an OpenShift cluster and set up a Kubernetes context'
 inputs:
   ##### Inputs for login

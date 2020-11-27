@@ -19,7 +19,7 @@ jobs:
     steps:
       - name: Install oc
         if: "runner.os != 'Linux'"
-        uses: redhat-actions/oc-installer@v1
+        uses: redhat-actions/oc-installer@v0.1
         with:
           oc_version: latest
 
