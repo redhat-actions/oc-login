@@ -12,7 +12,7 @@ import { Writable } from 'stream';
  */
 export default class CmdOutputHider extends Writable {
 
-    private hasEchoedCmdLine: boolean = false;
+    private hasEchoedCmdLine = false;
 
     constructor(
         private readonly outStream: Writable,
@@ -21,7 +21,7 @@ export default class CmdOutputHider extends Writable {
         super();
     }
 
-    public write(chunk: any): boolean {
+    public write(chunk: Buffer): boolean {
         if (!this.hasEchoedCmdLine) {
             this.outStream.write(chunk);
             if ((chunk.toString() as string).includes("\n")) {
