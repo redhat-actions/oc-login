@@ -34,6 +34,12 @@ inputs:
   namespace:
     description: "Set current context's namespace to this, after logging in."
     required: false
+  ##### Other inputs
+  reveal_cluster_name:
+    description: "By default, the cluster name is masked, since it can be used to derive the server URL. Set this to true to skip masking the cluster name."
+    required: false
+    default: "false"
+
 
 runs:
   using: 'node12'

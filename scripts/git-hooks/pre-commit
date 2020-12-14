@@ -5,6 +5,6 @@
 
 echo "----- Pre-commit -----"
 set -ex
-npm run bundle
 npm run generate-ins-outs
+npm run bundle
 git add -v dist/ src/generated

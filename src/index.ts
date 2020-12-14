@@ -10,7 +10,7 @@ import KubeConfig from "./kubeconfig";
 import * as utils from "./utils";
 
 async function run() {
-    ghCore.debug(`Runner OS is ${utils.getOS()}`)
+    ghCore.debug(`Runner OS is ${utils.getOS()}`);
     // ghCore.setCommandEcho(true);
     await Auth.login();
 
@@ -24,7 +24,8 @@ async function run() {
     }
     else {
         ghCore.info(`Exporting Kubeconfig`);
-        await KubeConfig.exportKubeConfig();
+        const revealClusterName: boolean = ghCore.getInput(Inputs.REVEAL_CLUSTER_NAME) == "true";
+        await KubeConfig.exportKubeConfig(revealClusterName);
     }
 }
 
