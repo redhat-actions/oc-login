@@ -44,24 +44,20 @@ type KubeConfig = Readonly<{
 
 namespace KubeConfig {
 
+    const KUBECONFIG_DIR = ".kube";
     const KUBECONFIG_ENVVAR = "KUBECONFIG";
 
-    /**
-     * Write out the current kubeconfig to a new file and export the `KUBECONFIG` env var to point to that file.
-     * This allows other steps in the job to reuse the kubeconfig.
-     */
-    export async function exportKubeConfig(revealClusterName: boolean): Promise<string> {
-        const kubeConfigRaw = await getKubeConfig();
+    export async function maskSecrets(revealClusterName: boolean): Promise<void> {
+        const kubeConfigRaw = await getKubeConfig(true);
 
-        let kubeConfigYml = jsYaml.safeLoad(kubeConfigRaw) as KubeConfig | undefined;
-        if (kubeConfigYml == null) {
+        let kubeConfig = jsYaml.safeLoad(kubeConfigRaw) as KubeConfig | undefined;
+        if (kubeConfig == null) {
             throw new Error(`Could not load Kubeconfig as yaml`);
         }
-        kubeConfigYml = kubeConfigYml as KubeConfig;
+        kubeConfig = kubeConfig as KubeConfig;
 
         if (!revealClusterName) {
-            ghCore.info(`Hiding cluster name`);
-            kubeConfigYml.contexts.forEach((context) => {
+            kubeConfig.contexts.forEach((context) => {
                 const clusterName = context.context?.cluster;
                 if (clusterName) {
                     ghCore.debug(`Masking cluster name`);
@@ -70,7 +66,7 @@ namespace KubeConfig {
             });
         }
 
-        kubeConfigYml.users.forEach((user) => {
+        kubeConfig.users.forEach((user) => {
             const secretKeys: (keyof KubeConfigUser)[] = [ "client-certificate-data", "client-key-data", "token" ];
             secretKeys.forEach((key) => {
                 const value = user.user[key];
@@ -80,19 +76,25 @@ namespace KubeConfig {
                 }
             });
         });
+    }
 
-        const kubeConfigDir = path.join(os.homedir(), ".kube");
-        await promisify(fs.mkdir)(kubeConfigDir, { recursive: true });
+    /**
+     * Write out the current kubeconfig to a new file and export the `KUBECONFIG` env var to point to that file.
+     * This allows other steps in the job to reuse the kubeconfig.
+     */
+    export async function exportKubeConfig(): Promise<string> {
+        const kubeConfigRaw = await getKubeConfig(false);
 
+        const kubeConfigDir = await mkKubeConfigDir(true);
         const kubeConfigPath = path.join(kubeConfigDir, "config");
 
         ghCore.info(`Writing out Kubeconfig to ${kubeConfigPath}`);
         await promisify(fs.writeFile)(kubeConfigPath, kubeConfigRaw);
         await promisify(fs.chmod)(kubeConfigPath, '600');
 
-        ghCore.startGroup("Kubeconfig contents");
-        ghCore.info(kubeConfigRaw);
-        ghCore.endGroup();
+        // ghCore.startGroup("Kubeconfig contents");
+        // ghCore.info(kubeConfigRaw);
+        // ghCore.endGroup();
 
         ghCore.info(`Exporting ${KUBECONFIG_ENVVAR}=${kubeConfigPath}`);
         ghCore.exportVariable(KUBECONFIG_ENVVAR, kubeConfigPath);
@@ -100,14 +102,47 @@ namespace KubeConfig {
         return kubeConfigPath;
     }
 
+    async function mkKubeConfigDir(firstTry: boolean): Promise<string> {
+        let kubeConfigDir: string;
+        if (firstTry) {
+            kubeConfigDir = path.join(os.homedir(), KUBECONFIG_DIR);
+        }
+        else {
+            kubeConfigDir = path.join(process.cwd(), KUBECONFIG_DIR);
+        }
+
+        try {
+            await promisify(fs.mkdir)(kubeConfigDir, { recursive: true });
+        }
+        catch (err) {
+            if (err.code !== "EACCES") {
+                ghCore.info(`No permissions to create ${kubeConfigDir}`);
+                if (firstTry) {
+                    return mkKubeConfigDir(false);
+                }
+                else {
+                    throw err;
+                }
+            }
+            else if (err.code === "EEXIST") {
+                ghCore.info(`${kubeConfigDir} already exists`);
+            }
+            else {
+                // Unexpected error - fail
+                throw err;
+            }
+        }
+
+        return kubeConfigDir;
+    }
+
     /**
      * @returns the current context's kubeconfig as a string.
      */
-    async function getKubeConfig(): Promise<string> {
+    async function getKubeConfig(hideOutput: boolean): Promise<string> {
         const ocOptions = Oc.getOptions({ flatten: "", minify: "true" });
 
-        // The stdout must be hidden since the secrets are not yet known to the action, and have not yet been masked.
-        const execResult = await Oc.exec([ Oc.Commands.Config, Oc.Commands.View, ...ocOptions ], { hideOutput: true });
+        const execResult = await Oc.exec([ Oc.Commands.Config, Oc.Commands.View, ...ocOptions ], { hideOutput });
         return execResult.out;
     }
 

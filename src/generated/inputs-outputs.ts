@@ -38,10 +38,6 @@ export enum Inputs {
      * By default, the cluster name is masked, since it can be used to derive the server URL. Set this to true to skip masking the cluster name.
      */
     REVEAL_CLUSTER_NAME = "reveal_cluster_name",
-    /**
-     * Do not generate kubeconfig or export its path.
-     */
-    SKIP_KUBECONFIG = "skip_kubeconfig",
 }
 
 export enum Outputs {
