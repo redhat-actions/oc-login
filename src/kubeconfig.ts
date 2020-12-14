@@ -5,6 +5,7 @@
 
 import * as path from "path";
 import * as fs from "fs";
+import * as os from "os";
 import { promisify } from "util";
 import * as ghCore from "@actions/core";
 import * as jsYaml from "js-yaml";
@@ -43,7 +44,6 @@ type KubeConfig = Readonly<{
 
 namespace KubeConfig {
 
-    const KUBECONFIG_FILENAME = "oc-kubeconfig.yaml";
     const KUBECONFIG_ENVVAR = "KUBECONFIG";
 
     /**
@@ -60,6 +60,7 @@ namespace KubeConfig {
         kubeConfigYml = kubeConfigYml as KubeConfig;
 
         if (!revealClusterName) {
+            ghCore.info(`Hiding cluster name`);
             kubeConfigYml.contexts.forEach((context) => {
                 const clusterName = context.context?.cluster;
                 if (clusterName) {
@@ -80,8 +81,10 @@ namespace KubeConfig {
             });
         });
 
-        // TODO make this path configurable through env or input.
-        const kubeConfigPath = path.resolve(process.cwd(), KUBECONFIG_FILENAME);
+        const kubeConfigDir = path.join(os.homedir(), ".kube");
+        await promisify(fs.mkdir)(kubeConfigDir, { recursive: true });
+
+        const kubeConfigPath = path.join(kubeConfigDir, "config");
 
         ghCore.info(`Writing out Kubeconfig to ${kubeConfigPath}`);
         await promisify(fs.writeFile)(kubeConfigPath, kubeConfigRaw);
