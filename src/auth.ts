@@ -4,7 +4,7 @@
  *************************************************************************************************/
 import * as path from "path";
 import * as fs from "fs";
-import { promisify } from "util"
+import { promisify } from "util";
 import * as ghCore from "@actions/core";
 
 import { Inputs } from './generated/inputs-outputs';
@@ -101,7 +101,7 @@ namespace Auth {
             ghCore.info("Authenticating using token");
             authOptions = {
                 token: authInputs.token
-            }
+            };
         }
         else if (authInputs.credentials) {
             ghCore.info("Authenticating using credentials");
@@ -109,7 +109,7 @@ namespace Auth {
             authOptions = {
                 username: authInputs.credentials?.username,
                 password: authInputs.credentials?.password,
-            }
+            };
         }
         else {
             throw new Error("Neither a token nor credentials was provided.");

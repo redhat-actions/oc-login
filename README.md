@@ -4,7 +4,6 @@
 [![oc login workflow](https://github.com/redhat-actions/oc-login/workflows/oc-login%20Example/badge.svg)](https://github.com/redhat-actions/oc-login/actions?query=workflow%3A%22oc-login+Example%22)
 [![Multiplatform Workflow](https://github.com/redhat-actions/oc-login/workflows/Multiplatform%20Workflow/badge.svg)](https://github.com/redhat-actions/oc-login/actions?query=workflow%3A%22Multiplatform+Workflow%22)
 
-<br><br>
 [![tag badge](https://img.shields.io/github/v/tag/redhat-actions/oc-login)](https://github.com/redhat-actions/oc-login/tags)
 [![license badge](https://img.shields.io/github/license/redhat-actions/oc-login)](./LICENSE)
 [![size badge](https://img.shields.io/github/size/redhat-actions/oc-login/dist/index.js)](./dist)

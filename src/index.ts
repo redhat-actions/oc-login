@@ -24,7 +24,10 @@ async function run() {
     }
     else {
         ghCore.info(`Exporting Kubeconfig`);
+
         const revealClusterName: boolean = ghCore.getInput(Inputs.REVEAL_CLUSTER_NAME) == "true";
+        ghCore.debug(`Reveal cluster name ? ${revealClusterName}`);
+
         await KubeConfig.exportKubeConfig(revealClusterName);
     }
 }
