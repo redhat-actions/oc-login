@@ -1,19 +1,16 @@
-name: Check Generated Code
+name: CI Checks
 on: [ push, pull_request ]
+
 jobs:
   check-inputs-outputs:
     name: Check Input and Output enums
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       COMMITTED_FILENAME: src/generated/inputs-outputs.ts
       GENERATED_FILENAME: action-generated-ins-outs.ts
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        env:
-          DEFAULT_BRANCH: main
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v2
 
       - name: Install dependencies
         run: npm ci
@@ -38,13 +35,9 @@ jobs:
 
   check-dist:
     name: Check Distribution
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        env:
-          DEFAULT_BRANCH: main
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v2
 
       - name: Install dependencies
         run: npm ci
@@ -54,3 +47,15 @@ jobs:
         with:
           bundle_file: dist/index.js
           bundle_command: "npm run bundle"
+
+  lint:
+    name: Run ESLint
+    runs-on: ubuntu-20.04
+    steps:
+        - uses: actions/checkout@v2
+
+        - name: Install dependencies
+          run: npm ci
+
+        - name: Run ESLint
+          run: npm run lint

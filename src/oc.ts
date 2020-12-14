@@ -59,7 +59,7 @@ namespace Oc {
 
             let arg = "--" + key;
             if (value != "") {
-                arg += `=${value}`
+                arg += `=${value}`;
             }
             argsBuilder.push(arg);
 
@@ -95,9 +95,9 @@ namespace Oc {
                 stdout += line + "\n";
             },
             errline: (line) => {
-                stderr += line + "\n"
+                stderr += line + "\n";
             },
-        }
+        };
 
         const exitCode = await ghExec.exec(EXECUTABLE, args, finalExecOptions);
 
