@@ -1,3 +1,7 @@
+/*************************************************************************************************
+ *  Copyright (c) Red Hat, Inc. All rights reserved.
+ *  Licensed under the MIT License. See LICENSE file in the project root for license information.
+ *************************************************************************************************/
 
 // Run with 'npm run generate-ins-outs'
 // Use 'npm run generate-ins-outs -- $outFile' to change the output file path
@@ -53,8 +57,12 @@ function enumify(enumName: string, inputsOrOutputs: [string, InputOrOutput][]) {
     const OUTPUT_INDENT = " ".repeat(4);
 
     return inputsOrOutputs.reduce((inputsBuilder: string, [name, props]) => {
-        inputsBuilder += `${OUTPUT_INDENT}// ${props.description.trim().replace("\\n", " ")}\n`;
-        inputsBuilder += `${OUTPUT_INDENT}${name.toUpperCase()} = "${name}",\n`
+        inputsBuilder +=
+`${OUTPUT_INDENT}/**
+${OUTPUT_INDENT} * ${props.description.trim().replace("\\n", " ")}
+${OUTPUT_INDENT} */
+${OUTPUT_INDENT}${name.toUpperCase()} = "${name}",
+`;
         return inputsBuilder;
     }, `export enum ${enumName} {\n`) + `}\n`;
 }

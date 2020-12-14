@@ -49,10 +49,8 @@ namespace KubeConfig {
     /**
      * Write out the current kubeconfig to a new file and export the `KUBECONFIG` env var to point to that file.
      * This allows other steps in the job to reuse the kubeconfig.
-     *
-     * @param namespace Set the current context's namespace to this, if set.
      */
-    export async function exportKubeConfig(): Promise<string> {
+    export async function exportKubeConfig(revealClusterName: boolean): Promise<string> {
         const kubeConfigRaw = await getKubeConfig();
 
         let kubeConfigYml = jsYaml.safeLoad(kubeConfigRaw) as KubeConfig | undefined;
@@ -61,15 +59,25 @@ namespace KubeConfig {
         }
         kubeConfigYml = kubeConfigYml as KubeConfig;
 
+        if (!revealClusterName) {
+            kubeConfigYml.contexts.forEach((context) => {
+                const clusterName = context.context?.cluster;
+                if (clusterName) {
+                    ghCore.debug(`Masking cluster name`);
+                    ghCore.setSecret(clusterName);
+                }
+            });
+        }
+
         kubeConfigYml.users.forEach((user) => {
             const secretKeys: (keyof KubeConfigUser)[] = [ "client-certificate-data", "client-key-data", "token" ];
             secretKeys.forEach((key) => {
-                const value = user.user[key]
+                const value = user.user[key];
                 if (value) {
                     ghCore.debug(`Masking ${key}`);
                     ghCore.setSecret(value);
                 }
-            })
+            });
         });
 
         // TODO make this path configurable through env or input.
@@ -83,7 +91,7 @@ namespace KubeConfig {
         ghCore.info(kubeConfigRaw);
         ghCore.endGroup();
 
-        ghCore.info(`Exporting ${KUBECONFIG_ENVVAR}=${kubeConfigPath}`)
+        ghCore.info(`Exporting ${KUBECONFIG_ENVVAR}=${kubeConfigPath}`);
         ghCore.exportVariable(KUBECONFIG_ENVVAR, kubeConfigPath);
 
         return kubeConfigPath;
