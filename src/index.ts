@@ -11,25 +11,25 @@ import * as utils from "./utils";
 
 async function run() {
     ghCore.debug(`Runner OS is ${utils.getOS()}`);
-    // ghCore.setCommandEcho(true);
+    ghCore.debug(`Node version is ${process.version}`);
+
+    await KubeConfig.setKubeConfigPath();
+
     await Auth.login();
+
+    const revealClusterName: boolean = ghCore.getInput(Inputs.REVEAL_CLUSTER_NAME) == "true";
+    ghCore.debug(`Reveal cluster name ? ${revealClusterName}`);
+    await KubeConfig.maskSecrets(revealClusterName);
 
     const namespace = ghCore.getInput(Inputs.NAMESPACE);
     if (namespace) {
         await KubeConfig.setCurrentContextNamespace(namespace);
     }
-
-    if (ghCore.getInput(Inputs.SKIP_KUBECONFIG) == "true") {
-        ghCore.info(`"${Inputs.SKIP_KUBECONFIG}" is set; skipping generating kubeconfig`);
-    }
     else {
-        ghCore.info(`Exporting Kubeconfig`);
-
-        const revealClusterName: boolean = ghCore.getInput(Inputs.REVEAL_CLUSTER_NAME) == "true";
-        ghCore.debug(`Reveal cluster name ? ${revealClusterName}`);
-
-        await KubeConfig.exportKubeConfig(revealClusterName);
+        ghCore.info(`No namespace provided`);
     }
+
+    await KubeConfig.exportKubeConfig();
 }
 
 run()

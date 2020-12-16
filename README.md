@@ -114,3 +114,7 @@ cp -r scripts/git-hooks/ .git/hooks/
 ```
 
 Then run `npm ci` to install dependencies, and you should be ready to develop.
+
+## Changelog
+
+See [CHANGELOG.md](./CHANGELOG.md).

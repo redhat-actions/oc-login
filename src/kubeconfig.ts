@@ -5,7 +5,6 @@
 
 import * as path from "path";
 import * as fs from "fs";
-import * as os from "os";
 import { promisify } from "util";
 import * as ghCore from "@actions/core";
 import * as jsYaml from "js-yaml";
@@ -44,24 +43,39 @@ type KubeConfig = Readonly<{
 
 namespace KubeConfig {
 
+    const KUBECONFIG_DIR = ".kube";
     const KUBECONFIG_ENVVAR = "KUBECONFIG";
 
-    /**
-     * Write out the current kubeconfig to a new file and export the `KUBECONFIG` env var to point to that file.
-     * This allows other steps in the job to reuse the kubeconfig.
-     */
-    export async function exportKubeConfig(revealClusterName: boolean): Promise<string> {
+    let kubeConfigPath: string | undefined;
+    let hasMaskedSecrets = false;
+
+    export async function setKubeConfigPath(): Promise<string> {
+        ghCore.debug(`Setting up kubeconfig path`);
+
+        // The kubeconfig is created under cwd/.kube/
+        // We do not use ~/.kube because that directory is not mounted into Docker actions, and this one is.
+        const kubeConfigDir = path.join(process.cwd(), KUBECONFIG_DIR);
+        await promisify(fs.mkdir)(kubeConfigDir, { recursive: true });
+
+        kubeConfigPath = path.join(kubeConfigDir, "config.yml");
+
+        ghCore.info(`Exporting ${KUBECONFIG_ENVVAR}=${kubeConfigPath}`);
+        ghCore.exportVariable(KUBECONFIG_ENVVAR, kubeConfigPath);
+        return kubeConfigPath;
+    }
+
+    export async function maskSecrets(revealClusterName: boolean): Promise<void> {
+        ghCore.debug(`Masking secrets`);
         const kubeConfigRaw = await getKubeConfig();
 
-        let kubeConfigYml = jsYaml.safeLoad(kubeConfigRaw) as KubeConfig | undefined;
-        if (kubeConfigYml == null) {
+        let kubeConfig = jsYaml.safeLoad(kubeConfigRaw) as KubeConfig | undefined;
+        if (kubeConfig == null) {
             throw new Error(`Could not load Kubeconfig as yaml`);
         }
-        kubeConfigYml = kubeConfigYml as KubeConfig;
+        kubeConfig = kubeConfig as KubeConfig;
 
         if (!revealClusterName) {
-            ghCore.info(`Hiding cluster name`);
-            kubeConfigYml.contexts.forEach((context) => {
+            kubeConfig.contexts.forEach((context) => {
                 const clusterName = context.context?.cluster;
                 if (clusterName) {
                     ghCore.debug(`Masking cluster name`);
@@ -70,7 +84,7 @@ namespace KubeConfig {
             });
         }
 
-        kubeConfigYml.users.forEach((user) => {
+        kubeConfig.users.forEach((user) => {
             const secretKeys: (keyof KubeConfigUser)[] = [ "client-certificate-data", "client-key-data", "token" ];
             secretKeys.forEach((key) => {
                 const value = user.user[key];
@@ -81,22 +95,35 @@ namespace KubeConfig {
             });
         });
 
-        const kubeConfigDir = path.join(os.homedir(), ".kube");
-        await promisify(fs.mkdir)(kubeConfigDir, { recursive: true });
+        hasMaskedSecrets = true;
+        ghCore.debug(`Finished masking secrets`);
+    }
 
-        const kubeConfigPath = path.join(kubeConfigDir, "config");
+    export async function setCurrentContextNamespace(namespace: string): Promise<void> {
+        ghCore.debug(`Set current context's namespace to "${namespace}"`);
+        const ocOptions = Oc.getOptions({ current: "", namespace });
+
+        await Oc.exec([ Oc.Commands.Config, Oc.Commands.Set_Context, ...ocOptions ]);
+    }
+
+    /**
+     * Write out the current kubeconfig to a new file and export the `KUBECONFIG` env var to point to that file.
+     * This allows other steps in the job to reuse the kubeconfig.
+     */
+    export async function exportKubeConfig(): Promise<string> {
+        if (!kubeConfigPath) {
+            throw new Error(`kubeconfig path is not set - cannot export kubeconfig.`);
+        }
+
+        const kubeConfigRaw = await getKubeConfig();
 
         ghCore.info(`Writing out Kubeconfig to ${kubeConfigPath}`);
         await promisify(fs.writeFile)(kubeConfigPath, kubeConfigRaw);
         await promisify(fs.chmod)(kubeConfigPath, '600');
 
-        ghCore.startGroup("Kubeconfig contents");
-        ghCore.info(kubeConfigRaw);
-        ghCore.endGroup();
-
-        ghCore.info(`Exporting ${KUBECONFIG_ENVVAR}=${kubeConfigPath}`);
-        ghCore.exportVariable(KUBECONFIG_ENVVAR, kubeConfigPath);
-
+        // ghCore.startGroup("Kubeconfig contents");
+        // ghCore.info(kubeConfigRaw);
+        // ghCore.endGroup();
         return kubeConfigPath;
     }
 
@@ -104,18 +131,11 @@ namespace KubeConfig {
      * @returns the current context's kubeconfig as a string.
      */
     async function getKubeConfig(): Promise<string> {
-        const ocOptions = Oc.getOptions({ flatten: "", minify: "true" });
+        const ocOptions = Oc.getOptions({ flatten: "" });
 
-        // The stdout must be hidden since the secrets are not yet known to the action, and have not yet been masked.
-        const execResult = await Oc.exec([ Oc.Commands.Config, Oc.Commands.View, ...ocOptions ], { hideOutput: true });
+        const hideOutput = !hasMaskedSecrets;
+        const execResult = await Oc.exec([ Oc.Commands.Config, Oc.Commands.View, ...ocOptions ], { hideOutput });
         return execResult.out;
-    }
-
-    export async function setCurrentContextNamespace(namespace: string): Promise<void> {
-        ghCore.info(`Set current context's namespace to "${namespace}"`);
-        const ocOptions = Oc.getOptions({ current: "", namespace });
-
-        await Oc.exec([ Oc.Commands.Config, Oc.Commands.Set_Context, ...ocOptions ]);
     }
 }
 
