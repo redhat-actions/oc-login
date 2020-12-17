@@ -28,9 +28,6 @@ inputs:
     description: "Contents of a Certificate Authority (.crt) file for your cluster's SSL certificate. Store in a secret."
     required: false
   ##### Inputs for kubeconfig
-  skip_kubeconfig:
-    description: 'Do not generate kubeconfig or export its path.'
-    required: false
   namespace:
     description: "Set current context's namespace to this, after logging in."
     required: false

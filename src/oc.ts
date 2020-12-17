@@ -4,6 +4,7 @@
  *************************************************************************************************/
 
 // import * as ghCore from "@actions/core";
+import * as os from "os";
 import * as ghExec from "@actions/exec";
 import CmdOutputHider from './cmdOutputHider';
 import * as util from "./utils";
@@ -73,7 +74,7 @@ namespace Oc {
      * @throws If the exitCode is not 0, unless execOptions.ignoreReturnCode is set.
      *
      * @param args Arguments and options to 'oc'. Use getOptions to convert an options mapping into a string[].
-     * @param execOptions Options for how to run the exec.
+     * @param execOptions Options for how to run the exec. See note about hideOutput on windows.
      * @returns Exit code and the contents of stdout/stderr.
      */
     export async function exec(args: string[], execOptions: ghExec.ExecOptions & { hideOutput?: boolean } = {}): Promise<{ exitCode: number, out: string, err: string }> {
@@ -85,6 +86,8 @@ namespace Oc {
 
         const finalExecOptions = { ...execOptions };
         if (execOptions.hideOutput) {
+            // There is some bug here, only on Windows, where if the wrapped stream is NOT used, the output is not correctly captured into the execResult.
+            // so, if you have to use the contents of stdout, do not set hideOutput.
             const wrappedOutStream = execOptions.outStream || process.stdout;
             finalExecOptions.outStream = new CmdOutputHider(wrappedOutStream, stdout);
         }
@@ -92,10 +95,10 @@ namespace Oc {
 
         finalExecOptions.listeners = {
             stdline: (line) => {
-                stdout += line + "\n";
+                stdout += line + os.EOL;
             },
             errline: (line) => {
-                stderr += line + "\n";
+                stderr += line + os.EOL;
             },
         };
 

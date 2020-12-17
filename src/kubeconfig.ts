@@ -43,14 +43,10 @@ type KubeConfig = Readonly<{
 
 namespace KubeConfig {
 
-    const KUBECONFIG_FILENAME = "oc-kubeconfig.yaml";
+    const KUBECONFIG_FILENAME = "kubeconfig.yaml";
     const KUBECONFIG_ENVVAR = "KUBECONFIG";
 
-    /**
-     * Write out the current kubeconfig to a new file and export the `KUBECONFIG` env var to point to that file.
-     * This allows other steps in the job to reuse the kubeconfig.
-     */
-    export async function exportKubeConfig(revealClusterName: boolean): Promise<string> {
+    export async function maskSecrets(revealClusterName: boolean): Promise<void> {
         const kubeConfigRaw = await getKubeConfig();
 
         let kubeConfigYml = jsYaml.safeLoad(kubeConfigRaw) as KubeConfig | undefined;
@@ -79,16 +75,33 @@ namespace KubeConfig {
                 }
             });
         });
+    }
+
+    /**
+     * Write out the current kubeconfig to a new file and export the `KUBECONFIG` env var to point to that file.
+     * This allows other steps in the job to reuse the kubeconfig.
+     */
+    export async function writeOutKubeConfig(): Promise<string> {
+        const kubeConfigContents = await getKubeConfig();
 
         // TODO make this path configurable through env or input.
-        const kubeConfigPath = path.resolve(process.cwd(), KUBECONFIG_FILENAME);
+        let kubeConfigDir;
+        const ghWorkspace = process.env["GITHUB_WORKSPACE"];
+        if (ghWorkspace) {
+            kubeConfigDir = ghWorkspace;
+        }
+        else {
+            kubeConfigDir = process.cwd();
+        }
+
+        const kubeConfigPath = path.resolve(kubeConfigDir, KUBECONFIG_FILENAME);
 
         ghCore.info(`Writing out Kubeconfig to ${kubeConfigPath}`);
-        await promisify(fs.writeFile)(kubeConfigPath, kubeConfigRaw);
+        await promisify(fs.writeFile)(kubeConfigPath, kubeConfigContents);
         await promisify(fs.chmod)(kubeConfigPath, '600');
 
         ghCore.startGroup("Kubeconfig contents");
-        ghCore.info(kubeConfigRaw);
+        ghCore.info(kubeConfigContents);
         ghCore.endGroup();
 
         ghCore.info(`Exporting ${KUBECONFIG_ENVVAR}=${kubeConfigPath}`);
@@ -97,22 +110,23 @@ namespace KubeConfig {
         return kubeConfigPath;
     }
 
-    /**
-     * @returns the current context's kubeconfig as a string.
-     */
-    async function getKubeConfig(): Promise<string> {
-        const ocOptions = Oc.getOptions({ flatten: "", minify: "true" });
-
-        // The stdout must be hidden since the secrets are not yet known to the action, and have not yet been masked.
-        const execResult = await Oc.exec([ Oc.Commands.Config, Oc.Commands.View, ...ocOptions ], { hideOutput: true });
-        return execResult.out;
-    }
-
     export async function setCurrentContextNamespace(namespace: string): Promise<void> {
         ghCore.info(`Set current context's namespace to "${namespace}"`);
         const ocOptions = Oc.getOptions({ current: "", namespace });
 
         await Oc.exec([ Oc.Commands.Config, Oc.Commands.Set_Context, ...ocOptions ]);
+    }
+
+    /**
+     * @returns the contents of the kubeconfig file as a string.
+     */
+    async function getKubeConfig(): Promise<string> {
+        const ocOptions = Oc.getOptions({ flatten: "" });
+
+        const execResult = await Oc.exec([ Oc.Commands.Config, Oc.Commands.View, ...ocOptions ],
+            { hideOutput: true /* Changing this breaks windows - See note about hideOutput in oc.exec */ }
+        );
+        return execResult.out;
     }
 }
 
