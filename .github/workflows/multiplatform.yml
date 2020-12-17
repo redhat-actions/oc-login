@@ -1,5 +1,9 @@
 name: Multiplatform Workflow
-on: [ workflow_dispatch ]
+on:
+  push:
+    branches: [ main, test ]
+  pull_request:
+  workflow_dispatch:
 
 jobs:
   login:
@@ -19,7 +23,7 @@ jobs:
     steps:
       - name: Install oc
         if: "runner.os != 'Linux'"
-        uses: redhat-actions/oc-installer@v0.1
+        uses: redhat-actions/oc-installer@v1
         with:
           oc_version: latest
 
@@ -34,14 +38,10 @@ jobs:
         run:
           kubectl version --client --short
 
-      - name: Checkout
-        uses: actions/checkout@v2
-        env:
-          DEFAULT_BRANCH: main
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v2
 
       - name: Authenticate and set context
-        uses: redhat-actions/oc-login@v0.1
+        uses: ./
         with:
           openshift_server_url: ${{ secrets.OPENSHIFT_SERVER }}
           openshift_token: ${{ secrets.OPENSHIFT_TOKEN }}
