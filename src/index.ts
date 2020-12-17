@@ -13,6 +13,8 @@ async function run() {
     ghCore.debug(`Runner OS is ${utils.getOS()}`);
     ghCore.debug(`Node version is ${process.version}`);
 
+    ghCore.warning(`TEST CHANGE !!`);
+
     await Auth.login();
 
     const revealClusterName: boolean = ghCore.getInput(Inputs.REVEAL_CLUSTER_NAME) == "true";
