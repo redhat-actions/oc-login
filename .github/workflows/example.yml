@@ -1,10 +1,14 @@
 name: oc-login Example
-on: [ push, workflow_dispatch ]
+on:
+  push:
+    branches: [ main, test ]
+  pull_request:
+  workflow_dispatch:
 
 jobs:
   login:
     name: OpenShift Login and Test
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     env:
       TEST_MANIFEST: __tests__/manifests/timer.yaml
       TEST_NAMESPACE: tetchell-code
@@ -13,7 +17,9 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Log in and set context
-        uses: redhat-actions/oc-login@v0.1
+        # In a real workflow, point the 'uses' to a tag.
+        # uses: redhat-actions/oc-login@v1
+        uses: ./
         with:
           openshift_server_url: ${{ secrets.OPENSHIFT_SERVER }}
           openshift_token: ${{ secrets.OPENSHIFT_TOKEN }}
