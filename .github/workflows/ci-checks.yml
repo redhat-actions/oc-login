@@ -22,7 +22,7 @@ jobs:
 
       - name: Generate inputs and outputs
         run: |
-          npm run generate-ins-outs -- --outFile='${{ env.GENERATED_FILENAME }}'
+          npx action-io-generator --outFile='${{ env.GENERATED_FILENAME }}'
 
       - name: Test equivalence
         run: git --no-pager diff --no-index --exit-code '${{ env.COMMITTED_FILENAME }}' '${{ env.GENERATED_FILENAME }}'
