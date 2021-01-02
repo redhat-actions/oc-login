@@ -18,8 +18,11 @@ export function getOS(): OS {
         }
         else if (rawOS !== "linux") {
             console.warn(`Unrecognized OS "${rawOS}"`);
+            currentOS = "linux";
         }
-        currentOS = "linux";
+        else {
+            currentOS = "linux";
+        }
     }
 
     return currentOS;
