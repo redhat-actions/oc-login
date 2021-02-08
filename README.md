@@ -1,6 +1,6 @@
 # oc-login
 
-[![CI Checks workflow](https://github.com/redhat-actions/oc-login/workflows/CI%20Checks/badge.svg)](https://github.com/redhat-actions/oc-login/actions?query=workflow%3A%22CI%20Checks%22)
+[![CI checks](https://github.com/redhat-actions/oc-login/workflows/CI%20checks/badge.svg)](https://github.com/redhat-actions/oc-login/actions?query=workflow%3A%22CI+checks%22)
 [![oc login workflow](https://github.com/redhat-actions/oc-login/workflows/oc-login%20Example/badge.svg)](https://github.com/redhat-actions/oc-login/actions?query=workflow%3A%22oc-login+Example%22)
 [![Multiplatform Workflow](https://github.com/redhat-actions/oc-login/workflows/Multiplatform%20Workflow/badge.svg)](https://github.com/redhat-actions/oc-login/actions?query=workflow%3A%22Multiplatform+Workflow%22)
 

@@ -7,8 +7,8 @@ import * as fs from "fs";
 import { promisify } from "util";
 import * as ghCore from "@actions/core";
 
-import { Inputs } from './generated/inputs-outputs';
-import Oc from './oc';
+import { Inputs } from "./generated/inputs-outputs";
+import Oc from "./oc";
 
 namespace Auth {
     type OSAuthInfo = Readonly<{
@@ -20,7 +20,7 @@ namespace Auth {
         token?: string;
         certAuthorityData?: string;
         skipTlsVerify: boolean;
-    }>
+    }>;
 
     /**
      * Get the token or credentials action inputs and return them in one object.
@@ -33,7 +33,7 @@ namespace Auth {
         }
 
         const caData = ghCore.getInput(Inputs.CERTIFICATE_AUTHORITY_DATA);
-        const skipTlsVerify = ghCore.getInput(Inputs.INSECURE_SKIP_TLS_VERIFY) == "true";
+        const skipTlsVerify = ghCore.getInput(Inputs.INSECURE_SKIP_TLS_VERIFY) === "true";
 
         const authInfo: OSAuthInfo = {
             serverURL,
@@ -50,7 +50,7 @@ namespace Auth {
                 ...authInfo,
                 credentials: {
                     username: openshiftUsername,
-                    password: openshiftPassword
+                    password: openshiftPassword,
                 },
             };
         }
@@ -66,9 +66,9 @@ namespace Auth {
         }
 
         // neither token nor username/password are set
-        throw new Error(`Failed to login: Required action inputs are missing. ` +
-            `Either "${Inputs.OPENSHIFT_TOKEN}", or both "${Inputs.OPENSHIFT_USERNAME}" and "${Inputs.OPENSHIFT_PASSWORD}" must be set.`
-        );
+        throw new Error(`Failed to login: Required action inputs are missing. `
+            + `Either "${Inputs.OPENSHIFT_TOKEN}", or both "${Inputs.OPENSHIFT_USERNAME}" and `
+            + `"${Inputs.OPENSHIFT_PASSWORD}" must be set.`);
     }
 
     const CA_FILE = "openshift-ca.crt";
@@ -100,15 +100,15 @@ namespace Auth {
         if (authInputs.token) {
             ghCore.info("Authenticating using token");
             authOptions = {
-                token: authInputs.token
+                token: authInputs.token,
             };
         }
         else if (authInputs.credentials) {
             ghCore.info("Authenticating using credentials");
 
             authOptions = {
-                username: authInputs.credentials?.username,
-                password: authInputs.credentials?.password,
+                username: authInputs.credentials.username,
+                password: authInputs.credentials.password,
             };
         }
         else {

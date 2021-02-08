@@ -5,17 +5,17 @@
 
 import * as ghCore from "@actions/core";
 import Auth from "./auth";
-import { Inputs } from './generated/inputs-outputs';
+import { Inputs } from "./generated/inputs-outputs";
 import KubeConfig from "./kubeconfig";
 import * as utils from "./utils";
 
-async function run() {
+async function run(): Promise<void> {
     ghCore.debug(`Runner OS is ${utils.getOS()}`);
     ghCore.debug(`Node version is ${process.version}`);
 
     await Auth.login();
 
-    const revealClusterName: boolean = ghCore.getInput(Inputs.REVEAL_CLUSTER_NAME) == "true";
+    const revealClusterName: boolean = ghCore.getInput(Inputs.REVEAL_CLUSTER_NAME) === "true";
     ghCore.debug(`Reveal cluster name ? ${revealClusterName}`);
     await KubeConfig.maskSecrets(revealClusterName);
 
@@ -31,7 +31,7 @@ async function run() {
 }
 
 run()
-.then(() => {
-    ghCore.info("Success.");
-})
-.catch(ghCore.setFailed);
+    .then(() => {
+        ghCore.info("Success.");
+    })
+    .catch(ghCore.setFailed);
