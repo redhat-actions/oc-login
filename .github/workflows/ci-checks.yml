@@ -1,10 +1,8 @@
 name: CI Checks
 on:
   push:
-    branches: [ main, test ]
   pull_request:
   workflow_dispatch:
-
 
 jobs:
   check-inputs-outputs:

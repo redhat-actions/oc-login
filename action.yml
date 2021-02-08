@@ -33,7 +33,9 @@ inputs:
     required: false
   ##### Other inputs
   reveal_cluster_name:
-    description: "By default, the cluster name is masked, since it can be used to derive the server URL. Set this to true to skip masking the cluster name."
+    description: | 
+      "By default, the cluster name is masked, since it can be used to derive the server URL.
+      Set this to true to skip masking the cluster name."
     required: false
     default: "false"
 

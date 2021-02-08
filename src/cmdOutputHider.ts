@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See LICENSE file in the project root for license information.
  *************************************************************************************************/
 
-import { Writable } from 'stream';
+import { Writable } from "stream";
 
 /**
  * Use this when the desired behaviour is to print the command line (the first line), but not the output.
@@ -11,7 +11,6 @@ import { Writable } from 'stream';
  * This allows us to hide output from the user but still use it programmatically.
  */
 export default class CmdOutputHider extends Writable {
-
     private hasEchoedCmdLine = false;
 
     constructor(

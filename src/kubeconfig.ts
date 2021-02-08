@@ -14,7 +14,7 @@ type KubeConfigUser = Readonly<{
     "client-certificate-data"?: string;
     "client-key-data"?: string;
     token?: string;
-}>
+}>;
 
 type KubeConfig = Readonly<{
     apiVersion: string;
@@ -39,7 +39,7 @@ type KubeConfig = Readonly<{
         name: string;
         user: KubeConfigUser;
     }]
-}>
+}>;
 
 namespace KubeConfig {
 
@@ -57,7 +57,7 @@ namespace KubeConfig {
 
         if (!revealClusterName) {
             kubeConfigYml.contexts.forEach((context) => {
-                const clusterName = context.context?.cluster;
+                const clusterName = context.context.cluster;
                 if (clusterName) {
                     ghCore.debug(`Masking cluster name`);
                     ghCore.setSecret(clusterName);
@@ -86,7 +86,7 @@ namespace KubeConfig {
 
         // TODO make this path configurable through env or input.
         let kubeConfigDir;
-        const ghWorkspace = process.env["GITHUB_WORKSPACE"];
+        const ghWorkspace = process.env.GITHUB_WORKSPACE;
         if (ghWorkspace) {
             kubeConfigDir = ghWorkspace;
         }
@@ -98,7 +98,7 @@ namespace KubeConfig {
 
         ghCore.info(`Writing out Kubeconfig to ${kubeConfigPath}`);
         await promisify(fs.writeFile)(kubeConfigPath, kubeConfigContents);
-        await promisify(fs.chmod)(kubeConfigPath, '600');
+        await promisify(fs.chmod)(kubeConfigPath, "600");
 
         ghCore.startGroup("Kubeconfig contents");
         ghCore.info(kubeConfigContents);
@@ -114,7 +114,7 @@ namespace KubeConfig {
         ghCore.info(`Set current context's namespace to "${namespace}"`);
         const ocOptions = Oc.getOptions({ current: "", namespace });
 
-        await Oc.exec([ Oc.Commands.Config, Oc.Commands.Set_Context, ...ocOptions ]);
+        await Oc.exec([ Oc.Commands.Config, Oc.Commands.SetContext, ...ocOptions ]);
     }
 
     /**
@@ -124,8 +124,7 @@ namespace KubeConfig {
         const ocOptions = Oc.getOptions({ flatten: "" });
 
         const execResult = await Oc.exec([ Oc.Commands.Config, Oc.Commands.View, ...ocOptions ],
-            { hideOutput: true /* Changing this breaks windows - See note about hideOutput in oc.exec */ }
-        );
+            { hideOutput: true /* Changing this breaks windows - See note about hideOutput in oc.exec */ });
         return execResult.out;
     }
 }

@@ -6,7 +6,7 @@
 // import * as ghCore from "@actions/core";
 import * as os from "os";
 import * as ghExec from "@actions/exec";
-import CmdOutputHider from './cmdOutputHider';
+import CmdOutputHider from "./cmdOutputHider";
 import * as util from "./utils";
 
 const EXECUTABLE = util.getOS() === "windows" ? "oc.exe" : "oc";
@@ -19,7 +19,7 @@ namespace Oc {
         Login = "login",
         Config = "config",
         View = "view",
-        Set_Context = "set-context",
+        SetContext = "set-context",
         Whoami = "whoami",
     }
 
@@ -59,7 +59,7 @@ namespace Oc {
             }
 
             let arg = "--" + key;
-            if (value != "") {
+            if (value !== "") {
                 arg += `=${value}`;
             }
             argsBuilder.push(arg);
@@ -77,8 +77,9 @@ namespace Oc {
      * @param execOptions Options for how to run the exec. See note about hideOutput on windows.
      * @returns Exit code and the contents of stdout/stderr.
      */
-    export async function exec(args: string[], execOptions: ghExec.ExecOptions & { hideOutput?: boolean } = {}): Promise<{ exitCode: number, out: string, err: string }> {
-
+    export async function exec(
+        args: string[], execOptions: ghExec.ExecOptions & { hideOutput?: boolean } = {}
+    ):Promise<{ exitCode: number, out: string, err: string }> {
         // ghCore.info(`${EXECUTABLE} ${args.join(" ")}`)
 
         let stdout = "";
@@ -86,7 +87,8 @@ namespace Oc {
 
         const finalExecOptions = { ...execOptions };
         if (execOptions.hideOutput) {
-            // There is some bug here, only on Windows, where if the wrapped stream is NOT used, the output is not correctly captured into the execResult.
+            // There is some bug here, only on Windows, where if the wrapped stream is NOT used,
+            // the output is not correctly captured into the execResult.
             // so, if you have to use the contents of stdout, do not set hideOutput.
             const wrappedOutStream = execOptions.outStream || process.stdout;
             finalExecOptions.outStream = new CmdOutputHider(wrappedOutStream, stdout);
@@ -94,10 +96,10 @@ namespace Oc {
         finalExecOptions.ignoreReturnCode = true;     // the return code is processed below
 
         finalExecOptions.listeners = {
-            stdline: (line) => {
+            stdline: (line): void => {
                 stdout += line + os.EOL;
             },
-            errline: (line) => {
+            errline: (line): void => {
                 stderr += line + os.EOL;
             },
         };
@@ -105,7 +107,8 @@ namespace Oc {
         const exitCode = await ghExec.exec(EXECUTABLE, args, finalExecOptions);
 
         if (execOptions.ignoreReturnCode !== true && exitCode !== 0) {
-            // Throwing the stderr as part of the Error makes the stderr show up in the action outline, which saves some clicking when debugging.
+            // Throwing the stderr as part of the Error makes the stderr show up in the action outline,
+            // which saves some clicking when debugging.
             let error = `oc exited with code ${exitCode}`;
             if (stderr) {
                 error += `\n${stderr}`;
@@ -118,7 +121,7 @@ namespace Oc {
         }
 
         return {
-            exitCode, out: stdout, err: stderr
+            exitCode, out: stdout, err: stderr,
         };
     }
 

@@ -1,8 +1,7 @@
 name: Multiplatform Workflow
 on:
   push:
-    branches: [ main, test ]
-  pull_request:
+  pull_request_target:
   workflow_dispatch:
 
 jobs:
