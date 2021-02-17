@@ -3,6 +3,7 @@
 [![CI checks](https://github.com/redhat-actions/oc-login/workflows/CI%20checks/badge.svg)](https://github.com/redhat-actions/oc-login/actions?query=workflow%3A%22CI+checks%22)
 [![oc login workflow](https://github.com/redhat-actions/oc-login/workflows/oc-login%20Example/badge.svg)](https://github.com/redhat-actions/oc-login/actions?query=workflow%3A%22oc-login+Example%22)
 [![Multiplatform Workflow](https://github.com/redhat-actions/oc-login/workflows/Multiplatform%20Workflow/badge.svg)](https://github.com/redhat-actions/oc-login/actions?query=workflow%3A%22Multiplatform+Workflow%22)
+[![Link checker](https://github.com/redhat-actions/oc-login/workflows/Link%20checker/badge.svg)](https://github.com/redhat-actions/oc-login/actions?query=workflow%3A%22Link+checker%22)
 
 [![tag badge](https://img.shields.io/github/v/tag/redhat-actions/oc-login)](https://github.com/redhat-actions/oc-login/tags)
 [![license badge](https://img.shields.io/github/license/redhat-actions/oc-login)](./LICENSE)
