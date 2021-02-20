@@ -1,7 +1,6 @@
 name: oc-login Example
 on:
   push:
-  pull_request_target:
   workflow_dispatch:
 
 jobs:
