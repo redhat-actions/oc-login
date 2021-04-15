@@ -2,6 +2,9 @@ name: Multiplatform Workflow
 on:
   push:
   workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'  # every day at midnight
+
 
 jobs:
   login:
@@ -15,8 +18,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       TEST_MANIFEST: __tests__/manifests/timer.yaml
-      TEST_USER: tetchell
-      TEST_NAMESPACE: tetchell-code
+      TEST_NAMESPACE: github-actions-bot-dev
 
     steps:
       - name: Install oc
@@ -41,7 +43,7 @@ jobs:
       - name: Authenticate and set context
         uses: ./
         with:
-          openshift_server_url: ${{ secrets.OPENSHIFT_SERVER }}
+          openshift_server_url: ${{ secrets.OPENSHIFT_URL }}
           openshift_token: ${{ secrets.OPENSHIFT_TOKEN }}
           insecure_skip_tls_verify: true
           namespace: ${{ env.TEST_NAMESPACE }}

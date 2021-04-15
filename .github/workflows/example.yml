@@ -2,6 +2,8 @@ name: oc-login Example
 on:
   push:
   workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'  # every day at midnight
 
 jobs:
   login:
@@ -9,7 +11,8 @@ jobs:
     runs-on: ubuntu-20.04
     env:
       TEST_MANIFEST: __tests__/manifests/timer.yaml
-      TEST_NAMESPACE: tetchell-code
+      TEST_USER: github-actions-bot
+      TEST_NAMESPACE: github-actions-bot-dev
 
     steps:
       - uses: actions/checkout@v2
@@ -19,7 +22,7 @@ jobs:
         # uses: redhat-actions/oc-login@v1
         uses: ./
         with:
-          openshift_server_url: ${{ secrets.OPENSHIFT_SERVER }}
+          openshift_server_url: ${{ secrets.OPENSHIFT_URL }}
           openshift_token: ${{ secrets.OPENSHIFT_TOKEN }}
           # openshift_username: ${{ env.TEST_USER }}
           # openshift_password: ${{ secrets.OPENSHIFT_PASSWORD }}
