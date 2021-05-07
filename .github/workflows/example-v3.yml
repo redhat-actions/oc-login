@@ -1,0 +1,46 @@
+name: oc-login v3 Example
+on:
+  push:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'  # every day at midnight
+
+jobs:
+  login:
+    name: OpenShift Login and Test
+    runs-on: ubuntu-20.04
+    env:
+      TEST_MANIFEST: __tests__/manifests/timer.yaml
+      TEST_USER: github-actions-bot
+      TEST_NAMESPACE: github-actions-bot-dev
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install oc v3
+        uses: redhat-actions/openshift-tools-installer@v1
+        with:
+          oc: 3
+
+      - name: Log in and set context
+        # In a real workflow, point the 'uses' to a tag.
+        # uses: redhat-actions/oc-login@v1
+        uses: ./
+        with:
+          openshift_server_url: ${{ secrets.OPENSHIFT_URL }}
+          openshift_token: ${{ secrets.OPENSHIFT_TOKEN }}
+          # openshift_username: ${{ env.TEST_USER }}
+          # openshift_password: ${{ secrets.OPENSHIFT_PASSWORD }}
+          insecure_skip_tls_verify: true
+          # certificate_authority_data: ${{ secrets.CA_DATA }}
+          namespace: ${{ env.TEST_NAMESPACE }}
+
+      - name: Deploy
+        uses: Azure/k8s-deploy@v1.3
+        with:
+          namespace: ${{ env.TEST_NAMESPACE }}
+          manifests: ${{ env.TEST_MANIFEST }}
+
+      - name: Clean up
+        run: |
+          oc delete -f ${{ env.TEST_MANIFEST }}

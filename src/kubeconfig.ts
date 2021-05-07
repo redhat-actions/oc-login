@@ -49,7 +49,7 @@ namespace KubeConfig {
     export async function maskSecrets(revealClusterName: boolean): Promise<void> {
         const kubeConfigRaw = await getKubeConfig();
 
-        let kubeConfigYml = jsYaml.safeLoad(kubeConfigRaw) as KubeConfig | undefined;
+        let kubeConfigYml = jsYaml.load(kubeConfigRaw) as KubeConfig | undefined;
         if (kubeConfigYml == null) {
             throw new Error(`Could not load Kubeconfig as yaml`);
         }
@@ -111,10 +111,13 @@ namespace KubeConfig {
     }
 
     export async function setCurrentContextNamespace(namespace: string): Promise<void> {
-        ghCore.info(`Set current context's namespace to "${namespace}"`);
-        const ocOptions = Oc.getOptions({ current: "", namespace });
+        const currentContext = (await Oc.exec([ Oc.Commands.Config, Oc.Commands.CurrentContext ])).output.trim();
 
-        await Oc.exec([ Oc.Commands.Config, Oc.Commands.SetContext, ...ocOptions ]);
+        ghCore.info(`Set current context's namespace to "${namespace}"`);
+
+        const nsOption = Oc.getOptions({ namespace });
+
+        await Oc.exec([ Oc.Commands.Config, Oc.Commands.SetContext, currentContext, ...nsOption ]);
     }
 
     /**
@@ -125,7 +128,7 @@ namespace KubeConfig {
 
         const execResult = await Oc.exec([ Oc.Commands.Config, Oc.Commands.View, ...ocOptions ],
             { hideOutput: true /* Changing this breaks windows - See note about hideOutput in oc.exec */ });
-        return execResult.out;
+        return execResult.output;
     }
 }
 
