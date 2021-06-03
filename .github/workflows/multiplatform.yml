@@ -23,9 +23,9 @@ jobs:
     steps:
       - name: Install oc
         if: "runner.os != 'Linux'"
-        uses: redhat-actions/oc-installer@v1
+        uses: redhat-actions/openshift-tools-installer@v1
         with:
-          oc_version: latest
+          oc: latest
 
       - name: Test oc
         run: oc version --client
