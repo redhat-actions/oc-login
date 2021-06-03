@@ -35,12 +35,6 @@ jobs:
           # certificate_authority_data: ${{ secrets.CA_DATA }}
           namespace: ${{ env.TEST_NAMESPACE }}
 
-      - name: Deploy
-        uses: Azure/k8s-deploy@v1.3
-        with:
-          namespace: ${{ env.TEST_NAMESPACE }}
-          manifests: ${{ env.TEST_MANIFEST }}
-
-      - name: Clean up
+      - name: Test
         run: |
-          oc delete -f ${{ env.TEST_MANIFEST }}
+          oc api-resources
