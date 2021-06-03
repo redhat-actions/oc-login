@@ -19,8 +19,8 @@ See the [OpenShift Documentation](https://docs.openshift.com/enterprise/3.0/dev_
 
 1. `oc` must be installed on the GitHub Action runner you specify.
 
-    - Presently the [Ubuntu Environments](https://github.com/actions/virtual-environments#available-environments) come with `oc 4.6.0` installed.
-    - If you want a different version of `oc`, or if you are using the Mac or Windows environments, use the [`oc-installer`](https://github.com/redhat-actions/oc-installer) action to install `oc` before running this action.
+    - The [Ubuntu Environments](https://github.com/actions/virtual-environments#available-environments) come with `oc` installed.
+    - If you want a different version of `oc`, or if you are using the Mac or Windows environments, use the [`openshift-tools-installer`](https://github.com/redhat-actions/openshift-tools-installer) action to install `oc` before running this action.
       - See the [multiplatform example](./.github/workflows/multiplatform.yml)
 
 2. Find your OpenShift Server URL.
