@@ -9,10 +9,6 @@ jobs:
   login:
     name: OpenShift Login and Test
     runs-on: ubuntu-20.04
-    env:
-      TEST_MANIFEST: __tests__/manifests/timer.yaml
-      TEST_USER: github-actions-bot
-      TEST_NAMESPACE: github-actions-bot-dev
 
     steps:
       - uses: actions/checkout@v2
@@ -27,7 +23,7 @@ jobs:
           # openshift_username: ${{ env.TEST_USER }}
           # openshift_password: ${{ secrets.OPENSHIFT_PASSWORD }}
           certificate_authority_data: ${{ secrets.CA_DATA }}
-          namespace: ${{ env.TEST_NAMESPACE }}
+          namespace: ${{ secrets.OPENSHIFT_NAMESPACE }}
 
       - name: Test
         run: |

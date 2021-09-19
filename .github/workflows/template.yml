@@ -1,0 +1,28 @@
+
+# Template workflow for the OpenShift GitHub Connector
+
+name: OpenShift
+on:
+  push:
+
+jobs:
+  openshift:
+    name: OpenShift
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Install OpenShift Client
+        uses: redhat-actions/openshift-tools-installer@v1
+        with:
+          oc: 4
+
+      - name: Login to OpenShift
+        uses: redhat-actions/oc-login@v1
+        with:
+          openshift_server_url: ${{ secrets.OPENSHIFT_SERVER }}
+          openshift_token: ${{ secrets.OPENSHIFT_TOKEN }}
+
+      - name: Test
+        run: oc get po
+
+      # You can now work with this OpenShift cluster for the rest of the job.

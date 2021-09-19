@@ -35,9 +35,8 @@ jobs:
       - name: Authenticate and set context
         uses: ./
         with:
-          openshift_server_url: ${{ secrets.OPENSHIFT_URL }}
+          openshift_server_url: ${{ secrets.OPENSHIFT_SERVER }}
           openshift_token: ${{ secrets.OPENSHIFT_TOKEN }}
-          insecure_skip_tls_verify: true
           namespace: ${{ env.TEST_NAMESPACE }}
 
       - name: Test
