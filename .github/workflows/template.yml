@@ -4,6 +4,7 @@
 name: OpenShift
 on:
   push:
+    branches: [ "n/a" ]
 
 jobs:
   openshift:
