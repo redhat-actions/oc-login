@@ -43,7 +43,7 @@ See the [OpenShift Documentation](https://docs.openshift.com/enterprise/3.0/dev_
     - You can also obtain the self-signed certificate data (from a `.crt` file) and use the `certificate_authority_data` input.
 
 5. Store the Server URL and any credentials (passwords, tokens, or certificates) in GitHub Secrets.
-    - [Refer to the GitHub documentation](https://docs.github.com/en/free-pro-team@latest/actions/reference/encrypted-secrets).
+    - [Refer to the GitHub documentation](https://docs.github.com/en/actions/security-guides/encrypted-secrets).
     - You can name them anything you like. See below for an example.
 
 6. Create your workflow.
