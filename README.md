@@ -41,11 +41,11 @@ See the [OpenShift Documentation](https://docs.openshift.com/enterprise/3.0/dev_
 4. Determine how you are going to manage SSL/TLS certificate verification. If your cluster uses self-signed certificates (which is the default), the GitHub runner will not recognize the certificate and will not allow you to issue HTTPS requests.
     - The easiest way to get around this is to set the `insecure_skip_tls_verify` input to `true`.
     - You can also obtain the self-signed certificate data (from a `.crt` file) and use the `certificate_authority_data` input.
-
+<!-- markdown-link-check-disable -->
 5. Store the Server URL and any credentials (passwords, tokens, or certificates) in GitHub Secrets.
     - [Refer to the GitHub documentation](https://docs.github.com/en/actions/security-guides/encrypted-secrets).
     - You can name them anything you like. See below for an example.
-
+<!-- markdown-link-check-enable -->
 6. Create your workflow.
 
 ## Example Workflow Step
