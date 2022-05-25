@@ -77,13 +77,7 @@ namespace KubeConfig {
         });
     }
 
-    /**
-     * Write out the current kubeconfig to a new file and export the `KUBECONFIG` env var to point to that file.
-     * This allows other steps in the job to reuse the kubeconfig.
-     */
-    export async function writeOutKubeConfig(): Promise<string> {
-        const kubeConfigContents = await getKubeConfig();
-
+    function getKubeConfigPath(): string {
         // TODO make this path configurable through env or input.
         let kubeConfigDir;
         const ghWorkspace = process.env.GITHUB_WORKSPACE;
@@ -94,7 +88,17 @@ namespace KubeConfig {
             kubeConfigDir = process.cwd();
         }
 
-        const kubeConfigPath = path.resolve(kubeConfigDir, KUBECONFIG_FILENAME);
+        return path.resolve(kubeConfigDir, KUBECONFIG_FILENAME);
+    }
+
+    /**
+     * Write out the current kubeconfig to a new file and export the `KUBECONFIG` env var to point to that file.
+     * This allows other steps in the job to reuse the kubeconfig.
+     */
+    export async function writeOutKubeConfig(): Promise<string> {
+        const kubeConfigContents = await getKubeConfig();
+
+        const kubeConfigPath = getKubeConfigPath();
 
         ghCore.info(`Writing out Kubeconfig to ${kubeConfigPath}`);
         await promisify(fs.writeFile)(kubeConfigPath, kubeConfigContents);
@@ -108,6 +112,16 @@ namespace KubeConfig {
         ghCore.exportVariable(KUBECONFIG_ENVVAR, kubeConfigPath);
 
         return kubeConfigPath;
+    }
+
+    /**
+     * Delete residual kube_config file
+     */
+    export async function deleteKubeConfig(): Promise<void> {
+        const kubeConfigPath = getKubeConfigPath();
+        if (await promisify(fs.exists)(kubeConfigPath)) {
+            await promisify(fs.unlink)(kubeConfigPath);
+        }
     }
 
     export async function setCurrentContextNamespace(namespace: string): Promise<void> {

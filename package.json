@@ -15,7 +15,7 @@
   "main": "dist/index.js",
   "scripts": {
     "compile": "tsc -p .",
-    "bundle": "ncc build src/index.ts --source-map --minify",
+    "bundle": "ncc build src/index.ts --source-map --minify && ncc build src/post.ts -o dist/post --source-map --minify",
     "clean": "rm -rf out/ dist/",
     "lint": "eslint . --max-warnings=0"
   },
