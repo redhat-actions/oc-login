@@ -9,6 +9,8 @@ import { Inputs } from "./generated/inputs-outputs";
 import KubeConfig from "./kubeconfig";
 import * as utils from "./utils";
 
+const IsPost = !!process.env.STATE_isPost;
+
 async function run(): Promise<void> {
     ghCore.debug(`Runner OS is ${utils.getOS()}`);
     ghCore.debug(`Node version is ${process.version}`);
@@ -30,8 +32,22 @@ async function run(): Promise<void> {
     await KubeConfig.writeOutKubeConfig();
 }
 
-run()
-    .then(() => {
-        ghCore.info("Success.");
-    })
-    .catch(ghCore.setFailed);
+async function logout(): Promise<void> {
+    await Auth.logout();
+    await KubeConfig.deleteKubeConfig();
+}
+
+if (!IsPost) {
+    run()
+        .then(() => {
+            ghCore.info("Success.");
+        })
+        .catch(ghCore.setFailed);
+}
+else {
+    const performLogout = ghCore.getBooleanInput("logout");
+    if (performLogout) {
+        logout()
+            .catch(ghCore.setFailed);
+    }
+}
