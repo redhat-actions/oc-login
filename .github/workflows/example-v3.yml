@@ -38,3 +38,16 @@ jobs:
       - name: Test
         run: |
           oc api-resources
+
+      - name: Test logout
+        # We fake the post state by setting this flag
+        # before executing the action. This should trigger logout
+        env:
+          STATE_isPost: 1
+        uses: ./
+        run: |
+          set -a
+          oc api-resources || EXIT_CODE=$?
+          if [[ ${EXIT_CODE} -eq 0 ]]; then 
+            exit 1; 
+          fi

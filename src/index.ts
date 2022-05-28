@@ -45,7 +45,7 @@ if (!IsPost) {
         .catch(ghCore.setFailed);
 }
 else {
-    const performLogout = ghCore.getBooleanInput("logout");
+    const performLogout = ghCore.getBooleanInput(Inputs.LOGOUT);
     if (performLogout) {
         logout()
             .catch(ghCore.setFailed);
