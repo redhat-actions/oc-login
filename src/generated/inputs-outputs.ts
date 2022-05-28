@@ -13,6 +13,12 @@ export enum Inputs {
      */
     INSECURE_SKIP_TLS_VERIFY = "insecure_skip_tls_verify",
     /**
+     * Perform logout during post job cleanup
+     * Required: false
+     * Default: "true"
+     */
+    LOGOUT = "logout",
+    /**
      * Set current context's namespace to this, after logging in.
      * Required: false
      * Default: None.
