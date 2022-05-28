@@ -29,21 +29,14 @@ jobs:
         run: |
           oc api-resources
 
-<<<<<<< HEAD
       - name: Log out
-=======
-      - name: Test logout
->>>>>>> origin/main
         # We fake the post state by setting this flag
         # before executing the action. This should trigger logout
         env:
           STATE_isPost: 1
         uses: ./
-<<<<<<< HEAD
 
       - name: Test logout
-=======
->>>>>>> origin/main
         run: |
           set -a
           oc api-resources || EXIT_CODE=$?
