@@ -131,6 +131,10 @@ namespace Auth {
 
         await Oc.exec([ Oc.Commands.Whoami ]);
     }
+
+    export async function logout(): Promise<void> {
+        await Oc.exec([ Oc.Commands.Logout ]);
+    }
 }
 
 export default Auth;

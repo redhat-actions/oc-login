@@ -38,8 +38,13 @@ inputs:
       Set this to true to skip masking the cluster name."
     required: false
     default: "false"
+  logout:
+    description: 'Perform logout during post job cleanup'
+    required: false
+    default: "true"
 
 
 runs:
-  using: 'node12'
+  using: 'node16'
   main: 'dist/index.js'
+  post: 'dist/index.js'
