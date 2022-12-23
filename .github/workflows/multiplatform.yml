@@ -21,7 +21,7 @@ jobs:
       TEST_NAMESPACE: github-actions-bot-dev
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Install oc
         if: "runner.os != 'Linux'"

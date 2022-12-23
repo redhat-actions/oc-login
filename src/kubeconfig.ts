@@ -126,8 +126,10 @@ namespace KubeConfig {
     async function getKubeConfig(): Promise<string> {
         const ocOptions = Oc.getOptions({ flatten: "" });
 
-        const execResult = await Oc.exec([ Oc.Commands.Config, Oc.Commands.View, ...ocOptions ],
-            { hideOutput: true /* Changing this breaks windows - See note about hideOutput in oc.exec */ });
+        const execResult = await Oc.exec(
+            [ Oc.Commands.Config, Oc.Commands.View, ...ocOptions ],
+            { hideOutput: true /* Changing this breaks windows - See note about hideOutput in oc.exec */ }
+        );
         return execResult.output;
     }
 }
