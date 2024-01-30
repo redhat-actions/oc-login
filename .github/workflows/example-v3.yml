@@ -15,7 +15,7 @@ jobs:
       TEST_NAMESPACE: ${{ secrets.OPENSHIFT_NAMESPACE }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install oc v3
         uses: redhat-actions/openshift-tools-installer@v1
