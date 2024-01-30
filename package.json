@@ -2,7 +2,7 @@
   "name": "oc-login",
   "version": "1.0.0",
   "engines": {
-    "node": "16"
+    "node": "20"
   },
   "description": "GitHub Action to log in to an OpenShift cluster and set Kubernetes context.",
   "repository": {
