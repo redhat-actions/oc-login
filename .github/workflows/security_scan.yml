@@ -9,16 +9,16 @@ on:
 
 jobs:
   crda-scan:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     name: Scan project vulnerability with CRDA
     steps:
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Install CRDA
         uses: redhat-actions/openshift-tools-installer@v1
