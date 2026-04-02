@@ -8,7 +8,7 @@ on:
 jobs:
   login:
     name: OpenShift Login and Test
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     env:
       TEST_MANIFEST: __tests__/manifests/timer.yaml
       TEST_USER: crt-redhat-github-actions-bot
