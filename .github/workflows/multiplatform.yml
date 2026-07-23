@@ -31,7 +31,7 @@ jobs:
 
       - name: Install oc
         if: "runner.os != 'Linux'"
-        uses: redhat-actions/openshift-tools-installer@v1
+        uses: redhat-actions/openshift-tools-installer@v2
         with:
           oc: latest
 
