@@ -26,25 +26,32 @@ export enum Inputs {
      */
     NAMESPACE = "namespace",
     /**
-     * Openshift Password. Store in a secret. Must be used with openshift_username.
+     * The audience claim for the GitHub OIDC token.
+     * Defaults to openshift_server_url if not set. Must match the audience configured on the cluster.
+     * Required: false
+     * Default: None.
+     */
+    OIDC_AUDIENCE = "oidc_audience",
+    /**
+     * OpenShift Password. Store in a secret. Must be used with openshift_username.
      * Required: false
      * Default: None.
      */
     OPENSHIFT_PASSWORD = "openshift_password",
     /**
-     * Openshift Server URL.
-     * Required: true
+     * OpenShift Server URL. Required unless a kubeconfig with a server already exists on the runner.
+     * Required: false
      * Default: None.
      */
     OPENSHIFT_SERVER_URL = "openshift_server_url",
     /**
-     * Openshift Bearer Token. Store in a secret.
+     * OpenShift Bearer Token. Store in a secret.
      * Required: false
      * Default: None.
      */
     OPENSHIFT_TOKEN = "openshift_token",
     /**
-     * Openshift Username. Must be used with openshift_password.
+     * OpenShift Username. Must be used with openshift_password.
      * Required: false
      * Default: None.
      */
@@ -56,6 +63,15 @@ export enum Inputs {
      * Default: "false"
      */
     REVEAL_CLUSTER_NAME = "reveal_cluster_name",
+    /**
+     * Authenticate using GitHub's OIDC token instead of a long-lived token or password.
+     * Requires the OpenShift cluster's API server to be configured with GitHub as an OIDC provider.
+     * The workflow must have 'permissions: id-token: write'.
+     * When enabled, openshift_server_url is required and openshift_token/username/password are ignored.
+     * Required: false
+     * Default: "false"
+     */
+    USE_OIDC = "use_oidc",
 }
 
 export enum Outputs {

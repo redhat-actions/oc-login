@@ -3,6 +3,7 @@
  *  Licensed under the MIT License. See LICENSE file in the project root for license information.
  *************************************************************************************************/
 
+import * as path from "path";
 import * as fs from "fs";
 import * as ghCore from "@actions/core";
 import Auth from "./auth.js";
@@ -12,6 +13,23 @@ import Oc from "./oc.js";
 import * as state from "./state.js";
 import * as utils from "./utils.js";
 
+/**
+ * Determine the kubeconfig path before login so that `oc login` writes directly
+ * to a workspace-specific file instead of the shared `~/.kube/config`.
+ * This prevents race conditions on self-hosted runners where concurrent jobs
+ * share the same home directory.
+ */
+function setKubeconfigEnv(): string {
+    const dir = process.env.GITHUB_WORKSPACE || process.cwd();
+    const kubeconfigPath = path.resolve(dir, "kubeconfig.yaml");
+
+    ghCore.info(`Setting KUBECONFIG=${kubeconfigPath} before login to avoid race conditions`);
+    process.env.KUBECONFIG = kubeconfigPath;
+    ghCore.exportVariable("KUBECONFIG", kubeconfigPath);
+
+    return kubeconfigPath;
+}
+
 async function run(): Promise<void> {
     ghCore.debug(`Runner OS is ${utils.getOS()}`);
     ghCore.debug(`Node version is ${process.version}`);
@@ -19,7 +37,19 @@ async function run(): Promise<void> {
     const logoutInput = ghCore.getInput(Inputs.LOGOUT) || "true";
     state.setLogout(logoutInput);
 
-    await Auth.login();
+    // Set KUBECONFIG before login to prevent concurrent jobs from clobbering
+    // each other's ~/.kube/config on self-hosted runners (#41)
+    const kubeconfigPath = setKubeconfigEnv();
+
+    const useOidc = ghCore.getInput(Inputs.USE_OIDC) === "true";
+
+    if (useOidc) {
+        ghCore.info("OIDC authentication enabled");
+        await Auth.oidcLogin();
+    }
+    else {
+        await Auth.login();
+    }
 
     const revealClusterName: boolean = ghCore.getInput(Inputs.REVEAL_CLUSTER_NAME) === "true";
     ghCore.debug(`Reveal cluster name ? ${revealClusterName}`);
@@ -33,7 +63,8 @@ async function run(): Promise<void> {
         ghCore.info(`No namespace provided`);
     }
 
-    const kubeconfigPath = await KubeConfig.writeOutKubeConfig();
+    // Write out the final kubeconfig (merging oc login's changes) and persist the path
+    await KubeConfig.writeOutKubeConfig();
     state.setKubeconfigPath(kubeconfigPath);
 }
 

@@ -73,7 +73,10 @@ describe("Oc.Commands", () => {
         expect(Oc.Commands.Logout).toBe("logout");
         expect(Oc.Commands.Config).toBe("config");
         expect(Oc.Commands.View).toBe("view");
+        expect(Oc.Commands.SetCluster).toBe("set-cluster");
+        expect(Oc.Commands.SetCredentials).toBe("set-credentials");
         expect(Oc.Commands.SetContext).toBe("set-context");
+        expect(Oc.Commands.UseContext).toBe("use-context");
         expect(Oc.Commands.CurrentContext).toBe("current-context");
         expect(Oc.Commands.Whoami).toBe("whoami");
     });
