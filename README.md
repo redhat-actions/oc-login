@@ -1,9 +1,7 @@
 # oc-login
 
-[![CI checks](https://github.com/redhat-actions/oc-login/workflows/CI%20checks/badge.svg)](https://github.com/redhat-actions/oc-login/actions?query=workflow%3A%22CI+checks%22)
-[![oc login workflow](https://github.com/redhat-actions/oc-login/workflows/oc-login%20Example/badge.svg)](https://github.com/redhat-actions/oc-login/actions?query=workflow%3A%22oc-login+Example%22)
-[![Multiplatform Workflow](https://github.com/redhat-actions/oc-login/workflows/Multiplatform%20Workflow/badge.svg)](https://github.com/redhat-actions/oc-login/actions?query=workflow%3A%22Multiplatform+Workflow%22)
-[![Link checker](https://github.com/redhat-actions/oc-login/workflows/Link%20checker/badge.svg)](https://github.com/redhat-actions/oc-login/actions?query=workflow%3A%22Link+checker%22)
+[![CI checks](https://github.com/redhat-actions/oc-login/actions/workflows/ci-checks.yml/badge.svg)](https://github.com/redhat-actions/oc-login/actions/workflows/ci-checks.yml)
+[![Link checker](https://github.com/redhat-actions/oc-login/actions/workflows/link_check.yml/badge.svg)](https://github.com/redhat-actions/oc-login/actions/workflows/link_check.yml)
 
 [![tag badge](https://img.shields.io/github/v/tag/redhat-actions/oc-login)](https://github.com/redhat-actions/oc-login/tags)
 [![license badge](https://img.shields.io/github/license/redhat-actions/oc-login)](./LICENSE)
@@ -41,11 +39,9 @@ See the [OpenShift Documentation](https://docs.openshift.com/enterprise/3.0/dev_
 4. Determine how you are going to manage SSL/TLS certificate verification. If your cluster uses self-signed certificates (which is the default), the GitHub runner will not recognize the certificate and will not allow you to issue HTTPS requests.
     - The easiest way to get around this is to set the `insecure_skip_tls_verify` input to `true`.
     - You can also obtain the self-signed certificate data (from a `.crt` file) and use the `certificate_authority_data` input.
-<!-- markdown-link-check-disable -->
 5. Store the Server URL and any credentials (passwords, tokens, or certificates) in GitHub Secrets.
     - [Refer to the GitHub documentation](https://docs.github.com/en/actions/security-guides/encrypted-secrets).
     - You can name them anything you like. See below for an example.
-<!-- markdown-link-check-enable -->
 6. Create your workflow.
 
 ## Example Workflow Step
