@@ -24,6 +24,7 @@ namespace Oc {
      */
     export enum Commands {
         Login = "login",
+        Logout = "logout",
         Config = "config",
         View = "view",
         SetContext = "set-context",

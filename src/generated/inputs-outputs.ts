@@ -13,6 +13,13 @@ export enum Inputs {
      */
     INSECURE_SKIP_TLS_VERIFY = "insecure_skip_tls_verify",
     /**
+     * Log out of the cluster and remove the kubeconfig at the end of the job.
+     * Recommended for self-hosted runners. Set to false to keep the session open.
+     * Required: false
+     * Default: "true"
+     */
+    LOGOUT = "logout",
+    /**
      * Set current context's namespace to this, after logging in.
      * Required: false
      * Default: None.
