@@ -11,7 +11,7 @@ import Oc from "./oc.js";
 
 namespace Auth {
     type OSAuthInfo = Readonly<{
-        serverURL: string;
+        serverURL?: string;
         credentials?: {
             username: string;
             password: string;
@@ -23,19 +23,23 @@ namespace Auth {
 
     /**
      * Get the token or credentials action inputs and return them in one object.
+     * Server URL is optional -- if omitted, oc login will use the current kubeconfig context.
      */
     function getAuthInputs(): OSAuthInfo {
-        const serverURL = ghCore.getInput(Inputs.OPENSHIFT_SERVER_URL, { required: true });
+        const serverURL = ghCore.getInput(Inputs.OPENSHIFT_SERVER_URL);
 
         if (serverURL) {
             ghCore.debug("Found OpenShift Server URL");
+        }
+        else {
+            ghCore.debug("No OpenShift Server URL provided; oc login will use existing kubeconfig context");
         }
 
         const caData = ghCore.getInput(Inputs.CERTIFICATE_AUTHORITY_DATA);
         const skipTlsVerify = ghCore.getInput(Inputs.INSECURE_SKIP_TLS_VERIFY) === "true";
 
         const authInfo: OSAuthInfo = {
-            serverURL,
+            serverURL: serverURL || undefined,
             certAuthorityData: caData,
             skipTlsVerify,
         };
@@ -86,6 +90,68 @@ namespace Auth {
     }
 
     /**
+     * Authenticate using GitHub's OIDC token and configure kubeconfig directly.
+     *
+     * This bypasses `oc login`'s OAuth flow and instead writes kubeconfig entries
+     * using `oc config` commands. The Kubernetes API server must be configured to
+     * accept GitHub OIDC tokens (with GitHub as an OIDC provider).
+     */
+    export async function oidcLogin(): Promise<void> {
+        const serverURL = ghCore.getInput(Inputs.OPENSHIFT_SERVER_URL);
+        if (!serverURL) {
+            throw new Error("openshift_server_url is required when use_oidc is enabled.");
+        }
+
+        const audience = ghCore.getInput(Inputs.OIDC_AUDIENCE) || serverURL;
+        ghCore.info(`Requesting GitHub OIDC token with audience: ${audience}`);
+
+        const oidcToken = await ghCore.getIDToken(audience);
+        ghCore.setSecret(oidcToken);
+        ghCore.info("Successfully obtained GitHub OIDC token");
+
+        const clusterName = "oidc-cluster";
+        const userName = "oidc-user";
+        const contextName = "oidc-context";
+
+        const caData = ghCore.getInput(Inputs.CERTIFICATE_AUTHORITY_DATA);
+        const skipTlsVerify = ghCore.getInput(Inputs.INSECURE_SKIP_TLS_VERIFY) === "true";
+
+        // Set up the cluster entry
+        const clusterArgs = [
+            Oc.Commands.Config, Oc.Commands.SetCluster, clusterName,
+            `--server=${serverURL}`,
+        ];
+        if (skipTlsVerify) {
+            clusterArgs.push("--insecure-skip-tls-verify=true");
+        }
+        if (caData) {
+            const caPath = await writeOutCA(caData);
+            clusterArgs.push(`--certificate-authority=${caPath}`);
+        }
+        await Oc.exec(clusterArgs);
+
+        // Set up the user entry with the OIDC token
+        await Oc.exec([
+            Oc.Commands.Config, Oc.Commands.SetCredentials, userName,
+            `--token=${oidcToken}`,
+        ]);
+
+        // Set up the context
+        await Oc.exec([
+            Oc.Commands.Config, Oc.Commands.SetContext, contextName,
+            `--cluster=${clusterName}`,
+            `--user=${userName}`,
+        ]);
+
+        // Use the context
+        await Oc.exec([
+            Oc.Commands.Config, Oc.Commands.UseContext, contextName,
+        ]);
+
+        await Oc.exec([ Oc.Commands.Whoami ]);
+    }
+
+    /**
      * Performs an 'oc login' into the given server, with the access token or credentials provided in the action inputs.
      * Token is given precedence if both are present.
      *
@@ -114,7 +180,9 @@ namespace Auth {
             throw new Error("Neither a token nor credentials was provided.");
         }
 
-        authOptions[Oc.Flags.ServerURL] = authInputs.serverURL;
+        if (authInputs.serverURL) {
+            authOptions[Oc.Flags.ServerURL] = authInputs.serverURL;
+        }
 
         if (authInputs.skipTlsVerify) {
             authOptions[Oc.Flags.SkipTLSVerify] = "";

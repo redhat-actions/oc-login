@@ -7,17 +7,30 @@ branding:
 inputs:
   ##### Inputs for login
   openshift_server_url:
-    description: 'Openshift Server URL.'
-    required: true
+    description: 'OpenShift Server URL. Required unless a kubeconfig with a server already exists on the runner.'
+    required: false
   ### Authenticating
   openshift_token:
-    description: 'Openshift Bearer Token. Store in a secret.'
+    description: 'OpenShift Bearer Token. Store in a secret.'
     required: false
   openshift_username:
-    description: 'Openshift Username. Must be used with openshift_password.'
+    description: 'OpenShift Username. Must be used with openshift_password.'
     required: false
   openshift_password:
-    description: 'Openshift Password. Store in a secret. Must be used with openshift_username.'
+    description: 'OpenShift Password. Store in a secret. Must be used with openshift_username.'
+    required: false
+  use_oidc:
+    description: |
+      Authenticate using GitHub's OIDC token instead of a long-lived token or password.
+      Requires the OpenShift cluster's API server to be configured with GitHub as an OIDC provider.
+      The workflow must have 'permissions: id-token: write'.
+      When enabled, openshift_server_url is required and openshift_token/username/password are ignored.
+    required: false
+    default: 'false'
+  oidc_audience:
+    description: |
+      The audience claim for the GitHub OIDC token.
+      Defaults to openshift_server_url if not set. Must match the audience configured on the cluster.
     required: false
   ### TLS Cert options
   insecure_skip_tls_verify:

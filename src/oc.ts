@@ -27,7 +27,10 @@ namespace Oc {
         Logout = "logout",
         Config = "config",
         View = "view",
+        SetCluster = "set-cluster",
+        SetCredentials = "set-credentials",
         SetContext = "set-context",
+        UseContext = "use-context",
         CurrentContext = "current-context",
         Whoami = "whoami",
     }
