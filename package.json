@@ -33,7 +33,7 @@
     "@redhat-actions/action-io-generator": "^1.5.0",
     "@eslint/js": "^10.0.1",
     "@types/js-yaml": "^4.0.9",
-    "@types/node": "^24",
+    "@types/node": "^26",
     "@vercel/ncc": "^0.44.1",
     "eslint": "^10.7.0",
     "typescript": "^6.0.3",
