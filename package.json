@@ -25,9 +25,9 @@
   "author": "Red Hat Inc.",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "^1.11.1",
-    "@actions/exec": "^1.1.1",
-    "js-yaml": "^4.3.0"
+    "@actions/core": "^3.0.1",
+    "@actions/exec": "^3.0.0",
+    "js-yaml": "^5.2.1"
   },
   "devDependencies": {
     "@redhat-actions/action-io-generator": "^1.5.0",
