@@ -6,10 +6,13 @@ on:
   push:
     branches: [ "n/a" ]
 
+permissions:
+  contents: read
+
 jobs:
   openshift:
     name: OpenShift
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Install OpenShift Client

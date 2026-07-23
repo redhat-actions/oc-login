@@ -5,13 +5,20 @@ on:
   schedule:
     - cron: '0 0 * * *'  # every day at midnight
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   login:
     name: OpenShift Login and Test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Log in and set context
         # In a real workflow, point the 'uses' to a tag.
