@@ -24,7 +24,7 @@
   "author": "Red Hat Inc.",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "^1.11.1",
+    "@actions/core": "^3.0.1",
     "@actions/exec": "^1.1.1",
     "js-yaml": "^4.3.0"
   },
