@@ -25,7 +25,7 @@ jobs:
       - uses: actions/checkout@v7
 
       - name: Install oc v3
-        uses: redhat-actions/openshift-tools-installer@v1
+        uses: redhat-actions/openshift-tools-installer@v2
         with:
           oc: 3
 

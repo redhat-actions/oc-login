@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: Install OpenShift Client
-        uses: redhat-actions/openshift-tools-installer@v1
+        uses: redhat-actions/openshift-tools-installer@v2
         with:
           oc: 4
 
