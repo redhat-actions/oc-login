@@ -4,11 +4,10 @@
  *************************************************************************************************/
 import * as path from "path";
 import * as fs from "fs";
-import { promisify } from "util";
 import * as ghCore from "@actions/core";
 
-import { Inputs } from "./generated/inputs-outputs";
-import Oc from "./oc";
+import { Inputs } from "./generated/inputs-outputs.js";
+import Oc from "./oc.js";
 
 namespace Auth {
     type OSAuthInfo = Readonly<{
@@ -81,7 +80,7 @@ namespace Auth {
         const caOutFile = path.join(process.cwd(), CA_FILE);
 
         ghCore.info(`Writing out certificate authority data to ${caOutFile}`);
-        await promisify(fs.writeFile)(caOutFile, caData);
+        await fs.promises.writeFile(caOutFile, caData);
 
         return caOutFile;
     }

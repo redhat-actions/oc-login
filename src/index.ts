@@ -4,10 +4,10 @@
  *************************************************************************************************/
 
 import * as ghCore from "@actions/core";
-import Auth from "./auth";
-import { Inputs } from "./generated/inputs-outputs";
-import KubeConfig from "./kubeconfig";
-import * as utils from "./utils";
+import Auth from "./auth.js";
+import { Inputs } from "./generated/inputs-outputs.js";
+import KubeConfig from "./kubeconfig.js";
+import * as utils from "./utils.js";
 
 async function run(): Promise<void> {
     ghCore.debug(`Runner OS is ${utils.getOS()}`);
