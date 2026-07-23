@@ -52,7 +52,7 @@ See the [OpenShift Documentation](https://docs.openshift.com/enterprise/3.0/dev_
 ```yaml
 steps:
   - name: Authenticate and set context
-    uses: redhat-actions/oc-login@v1
+    uses: redhat-actions/oc-login@v2
     env:
       # These can be stored in secrets, if desired.
       OPENSHIFT_USER: my-username
