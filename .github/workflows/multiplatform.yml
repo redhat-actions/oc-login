@@ -1,9 +1,6 @@
 name: Multiplatform Workflow
 on:
-  push:
   workflow_dispatch:
-  schedule:
-    - cron: '0 0 * * *'  # every day at midnight
 
 permissions:
   contents: read
