@@ -5,17 +5,20 @@ on:
       - '**.md'
   pull_request:
     paths:
-      -'**.md'
+      - '**.md'
   schedule:
     - cron: '0 0 * * *'  # every day at midnight
 
+permissions:
+  contents: read
 
 jobs:
   markdown-link-check:
     name: Check links in markdown
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: gaurav-nelson/github-action-markdown-link-check@v1
+      - uses: actions/checkout@v7
+      - name: Check links
+        uses: lycheeverse/lychee-action@v2
         with:
-          use-verbose-mode: true
+          args: '--verbose --no-progress **/*.md'

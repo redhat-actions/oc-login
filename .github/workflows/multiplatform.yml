@@ -5,6 +5,12 @@ on:
   schedule:
     - cron: '0 0 * * *'  # every day at midnight
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   login:
@@ -21,7 +27,7 @@ jobs:
       TEST_NAMESPACE: github-actions-bot-dev
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install oc
         if: "runner.os != 'Linux'"
