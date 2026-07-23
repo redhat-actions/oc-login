@@ -5,6 +5,19 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
+    ignore:
+      # TypeScript 7.x is incompatible with typescript-eslint v8 (peer dep <6.1.0)
+      - dependency-name: "typescript"
+        versions: [">=7"]
+      # @actions/core v3 and @actions/exec v3 are ESM-only packages;
+      # upgrading requires a broader CJS-to-ESM migration
+      - dependency-name: "@actions/core"
+        versions: [">=2"]
+      - dependency-name: "@actions/exec"
+        versions: [">=2"]
+      # js-yaml v5 changes module format; v4.3.0 already fixes known CVEs
+      - dependency-name: "js-yaml"
+        versions: [">=5"]
 
   - package-ecosystem: "github-actions"
     directory: "/"
