@@ -18,7 +18,8 @@
     "compile": "tsc -p .",
     "bundle": "ncc build src/index.ts --source-map --minify",
     "clean": "rm -rf out/ dist/",
-    "lint": "eslint . --max-warnings=0"
+    "lint": "eslint . --max-warnings=0",
+    "test": "vitest run"
   },
   "keywords": [],
   "author": "Red Hat Inc.",
@@ -36,6 +37,7 @@
     "@vercel/ncc": "^0.44.1",
     "eslint": "^10.7.0",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.65.0"
+    "typescript-eslint": "^8.65.0",
+    "vitest": "^4.1.10"
   }
 }

@@ -32,6 +32,12 @@ inputs:
     description: "Set current context's namespace to this, after logging in."
     required: false
   ##### Other inputs
+  logout:
+    description: |
+      Log out of the cluster and remove the kubeconfig at the end of the job.
+      Recommended for self-hosted runners. Set to false to keep the session open.
+    required: false
+    default: "true"
   reveal_cluster_name:
     description: |
       "By default, the cluster name is masked, since it can be used to derive the server URL.
@@ -43,3 +49,4 @@ inputs:
 runs:
   using: 'node24'
   main: 'dist/index.js'
+  post: 'dist/index.js'
