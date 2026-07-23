@@ -6,9 +6,9 @@
 import * as ghCore from "@actions/core";
 import * as ghExec from "@actions/exec";
 import * as path from "path";
-import CmdOutputHider from "./cmdOutputHider";
+import CmdOutputHider from "./cmdOutputHider.js";
 
-import * as util from "./utils";
+import * as util from "./utils.js";
 
 const EXECUTABLE = util.getOS() === "windows" ? "oc.exe" : "oc";
 
