@@ -16,7 +16,7 @@
   "main": "dist/index.js",
   "scripts": {
     "compile": "tsc -p .",
-    "bundle": "ncc build src/index.ts --source-map --minify",
+    "bundle": "esbuild src/index.ts --bundle --platform=node --target=node20 --format=cjs --outfile=dist/index.js --sourcemap --minify",
     "clean": "rm -rf out/ dist/",
     "lint": "eslint . --max-warnings=0",
     "test": "vitest run"
@@ -34,7 +34,7 @@
     "@eslint/js": "^10.0.1",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^26",
-    "@vercel/ncc": "^0.44.1",
+    "esbuild": "^0.28.1",
     "eslint": "^10.7.0",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.65.0",
