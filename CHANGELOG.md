@@ -1,5 +1,18 @@
 # oc-login Changelog
 
+## v2.0.1
+
+### Fixes
+- **Replaced `@vercel/ncc` with `esbuild`**: ncc cannot bundle ESM-only `@actions/core` v3 and `@actions/exec` v3 dependencies, producing a broken bundle that crashes at runtime with `Cannot find module '@actions/core'`. esbuild handles ESM-to-CJS bundling natively.
+
+### Dependencies
+- Bumped `js-yaml` from `^5.2.1` to `^5.2.2` (resolves high severity Dependabot alert)
+
+### Tests
+- Added bundle integrity test to catch unresolved module stubs in the distribution
+- Added bundle loadability integration test to verify the bundle loads without `MODULE_NOT_FOUND` errors
+- Enabled the test suite in CI (`ci-checks.yml`)
+
 ## v2.0
 
 ### Breaking Changes
@@ -16,8 +29,7 @@
 ### Dependencies
 - Upgraded `@actions/core` to v3.0.1, `@actions/exec` to v3.0.0, `js-yaml` to v5.2.1
 - Upgraded TypeScript to 6.x, ESLint to 10.x with flat config
-- Upgraded `@vercel/ncc` to 0.44.x
-- Bundle size reduced from 539kB to 86kB
+- Replaced `@vercel/ncc` with `esbuild` (see v2.0.1)
 
 ### CI & Infrastructure
 - Migrated all workflows to `ubuntu-24.04` with `actions/checkout@v7` and `actions/setup-node@v7`
