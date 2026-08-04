@@ -27,7 +27,7 @@
   "dependencies": {
     "@actions/core": "^3.0.1",
     "@actions/exec": "^3.0.0",
-    "js-yaml": "^5.2.2"
+    "js-yaml": "^5.2.3"
   },
   "devDependencies": {
     "@redhat-actions/action-io-generator": "^1.5.0",
