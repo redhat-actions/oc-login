@@ -9,7 +9,7 @@
 
 `oc-login` is a GitHub Action to log into an OpenShift cluster, and preserve that Kubernetes context for the remainder of the job.
 
-See the [OpenShift Documentation](https://docs.openshift.com/enterprise/3.0/dev_guide/authentication.html) for an explanation of a log in using `oc`, which this action wraps.
+See the [OpenShift Documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/4.22/html/cli_tools/openshift-cli-oc/) for an explanation of a log in using `oc`, which this action wraps.
 
 <a id="getting-started"></a>
 
