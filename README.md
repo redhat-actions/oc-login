@@ -40,7 +40,7 @@ See the [OpenShift Documentation](https://docs.redhat.com/en/documentation/opens
     - The easiest way to get around this is to set the `insecure_skip_tls_verify` input to `true`.
     - You can also obtain the self-signed certificate data (from a `.crt` file) and use the `certificate_authority_data` input.
 5. Store the Server URL and any credentials (passwords, tokens, or certificates) in GitHub Secrets.
-    - [Refer to the GitHub documentation](https://docs.github.com/en/actions/security-guides/encrypted-secrets).
+    - [Refer to the GitHub documentation](https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets).
     - You can name them anything you like. See below for an example.
 6. Create your workflow.
 
