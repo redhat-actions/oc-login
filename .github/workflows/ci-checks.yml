@@ -1,25 +1,9 @@
 name: CI checks
 on:
   push:
-    paths:
-      - 'src/**'
-      - '__tests__/**'
-      - 'action.yml'
-      - 'package*.json'
-      - 'tsconfig.json'
-      - 'tsconfig.test.json'
-      - 'eslint.config.*'
-      - '.github/workflows/ci-checks.yml'
+    paths-ignore: ['**.md']
   pull_request:
-    paths:
-      - 'src/**'
-      - '__tests__/**'
-      - 'action.yml'
-      - 'package*.json'
-      - 'tsconfig.json'
-      - 'tsconfig.test.json'
-      - 'eslint.config.*'
-      - '.github/workflows/ci-checks.yml'
+    paths-ignore: ['**.md']
   workflow_dispatch:
 
 permissions:
